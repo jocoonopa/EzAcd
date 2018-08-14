@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _Agent2 = require('./Utils/Agent');
+var _Agent2 = require('../Utils/EzACD/Agent');
 
 var _Agent3 = _interopRequireDefault(_Agent2);
 

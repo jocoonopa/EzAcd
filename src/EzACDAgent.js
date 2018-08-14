@@ -1,3 +1,3 @@
-import Agent from './Utils/Agent'
+import Agent from '../Utils/EzACD/Agent'
 
 export default class EzACDAgent extends Agent {}

@@ -1,8 +1,8 @@
 require('./bootstrap')
 
-import Agent from './Utils/EzACD/Agent'
+import EzACDAgent from './src/EzACDAgent'
 
-let agent = new Agent({
+let agent = new EzACDAgent({
     port: config.port,
     domain: config.domain,
     id: config.id,

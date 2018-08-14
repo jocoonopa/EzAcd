@@ -1,14 +1,14 @@
 'use strict';
 
-var _Agent = require('./Utils/EzACD/Agent');
+var _EzACDAgent = require('./src/EzACDAgent');
 
-var _Agent2 = _interopRequireDefault(_Agent);
+var _EzACDAgent2 = _interopRequireDefault(_EzACDAgent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 require('./bootstrap');
 
-var agent = new _Agent2.default({
+var agent = new _EzACDAgent2.default({
     port: config.port,
     domain: config.domain,
     id: config.id,
