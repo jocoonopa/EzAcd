@@ -14,6 +14,18 @@ var _Adapter = require('./Adapter');
 
 var _Adapter2 = _interopRequireDefault(_Adapter);
 
+var _prettyjson = require('prettyjson');
+
+var _prettyjson2 = _interopRequireDefault(_prettyjson);
+
+var _colors = require('colors');
+
+var _colors2 = _interopRequireDefault(_colors);
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -44,19 +56,19 @@ var Handler = function () {
         value: function receive(evt) {
             var data = evt.data || evt.utf8Data;
 
-            this.cb = _.find(this.cbs, {
+            this.cb = _lodash2.default.find(this.cbs, {
                 op: Number(_Adapter2.default.get(data, 'op'))
             });
 
             if (!_Adapter2.default.isSuccess(data)) {
                 return this.emit({
-                    eventName: _.isNil(this.cb) ? 'Unknown' : this.cb.event,
+                    eventName: _lodash2.default.isNil(this.cb) ? 'Unknown' : this.cb.event,
                     withData: _Adapter2.default.toObj(data),
                     error: true
                 });
             }
 
-            return !_.isNil(this.cb) && _.isFunction(this[this.cb.method]) ? this[this.cb.method](data) : null;
+            return !_lodash2.default.isNil(this.cb) && _lodash2.default.isFunction(this[this.cb.method]) ? this[this.cb.method](data) : null;
         }
 
         /**
@@ -190,7 +202,7 @@ var Handler = function () {
             var obj = _Adapter2.default.toObj(data);
 
             console.log('========= Call State ========='.blue);
-            console.log(prettyjson.render(obj));
+            console.log(_prettyjson2.default.render(obj));
 
             switch (obj.state) {
                 case 0:
@@ -242,7 +254,7 @@ var Handler = function () {
             var obj = _Adapter2.default.toObj(data);
 
             console.log('========= Agent State ========='.yellow);
-            console.log(prettyjson.render(obj));
+            console.log(_prettyjson2.default.render(obj));
 
             switch (Number(obj.state)) {
                 case 0:
@@ -309,7 +321,7 @@ var Handler = function () {
 
             var obj = _Adapter2.default.toObj(data);
 
-            if (_.includes([SIP_PHONE_DIALING, ACD_DN_QUEUE_COUNT_CHANGE], _.get(obj, 'atype'))) {
+            if (_lodash2.default.includes([SIP_PHONE_DIALING, ACD_DN_QUEUE_COUNT_CHANGE], _lodash2.default.get(obj, 'atype'))) {
                 return this.emit({
                     eventName: this.cb.event,
                     withData: obj
@@ -332,10 +344,10 @@ var Handler = function () {
 
             console.log('========= Call State ========='.pink);
 
-            console.log(prettyjson.render(obj));
+            console.log(_prettyjson2.default.render(obj));
 
             // 掛斷時，將 cid 改為 null
-            if (_.isEqual(Number(_.get(obj, 'state')), DISCONNECT_STATE)) {
+            if (_lodash2.default.isEqual(Number(_lodash2.default.get(obj, 'state')), DISCONNECT_STATE)) {
                 this.agent.cid = null;
             }
 

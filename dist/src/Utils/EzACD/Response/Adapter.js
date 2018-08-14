@@ -6,6 +6,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Adapter = function () {
@@ -26,13 +32,13 @@ var Adapter = function () {
         value: function get(data, key) {
             var messages = data.split("\n");
 
-            var message = _.find(messages, function (message) {
+            var message = _lodash2.default.find(messages, function (message) {
                 var pair = message.split('=');
 
-                return _.isEqual(pair[0], key);
+                return _lodash2.default.isEqual(pair[0], key);
             });
 
-            return _.isNil(message) ? null : message.split('=')[1];
+            return _lodash2.default.isNil(message) ? null : message.split('=')[1];
         }
 
         /**
@@ -47,7 +53,7 @@ var Adapter = function () {
         value: function isSuccess(data) {
             var code = Adapter.get(data, 'code');
 
-            return _.isEqual(Number(code), 0);
+            return _lodash2.default.isEqual(Number(code), 0);
         }
 
         /**
@@ -63,7 +69,7 @@ var Adapter = function () {
             var messages = data.split("\n");
             var obj = {};
 
-            _.each(messages, function (message) {
+            _lodash2.default.each(messages, function (message) {
                 var pair = message.split('=');
 
                 obj[pair[0]] = pair[1];

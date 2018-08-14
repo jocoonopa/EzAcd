@@ -28,6 +28,18 @@ var _CallAction = require('./CallAction');
 
 var _CallAction2 = _interopRequireDefault(_CallAction);
 
+var _prettyjson = require('prettyjson');
+
+var _prettyjson2 = _interopRequireDefault(_prettyjson);
+
+var _md = require('md5');
+
+var _md2 = _interopRequireDefault(_md);
+
+var _colors = require('colors');
+
+var _colors2 = _interopRequireDefault(_colors);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -90,6 +102,35 @@ var Agent = function () {
     _createClass(Agent, [{
         key: 'initSocket',
         value: function initSocket() {
+            return 'undefined' !== typeof window ? this.initBrowserSocket() : this.initNodeSocket();
+        }
+    }, {
+        key: 'initBrowserSocket',
+        value: function initBrowserSocket() {
+            var client = new _websocket.w3cwebsocket(this.url, 'cti-agent-protocol');
+            var self = this;
+
+            client.onerror = function () {
+                console.log('Connection Error');
+            };
+
+            client.onopen = function () {
+                self.connection = connection;
+
+                self.authorize();
+            };
+
+            client.onclose = function () {
+                console.log('echo-protocol Client Closed');
+            };
+
+            client.onmessage = function (message) {
+                self.handler.receive(message);
+            };
+        }
+    }, {
+        key: 'initNodeSocket',
+        value: function initNodeSocket() {
             var _this = this;
 
             this.socket = new _websocket.client();
@@ -322,7 +363,7 @@ var Agent = function () {
                 obj.seq = this.seq;
             }
 
-            console.log(prettyjson.render(obj));
+            console.log(_prettyjson2.default.render(obj));
 
             console.log("send:  \n".yellow + Agent.genSendStr(obj));
 
@@ -349,7 +390,7 @@ var Agent = function () {
     }, {
         key: 'auth',
         get: function get() {
-            return md5('' + this.ag + this.nonce + this.password);
+            return (0, _md2.default)('' + this.ag + this.nonce + this.password);
         }
     }], [{
         key: 'genSendStr',

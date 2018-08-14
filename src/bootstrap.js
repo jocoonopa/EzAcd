@@ -1,10 +1,4 @@
-require('colors')
-
-global.md5 = require('md5')
-global.WebSocketClient = require('websocket').client
 global._ = require('lodash')
-global.prettyjson = require('prettyjson')
-
 
 global.config = require('./config.json')
 global.title = `EzACD Shell (v.0.0.1 beta) (Node ${process.version})  by jocoonopa`

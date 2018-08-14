@@ -1,9 +1,12 @@
 import ResponseAdapter from './Response/Adapter'
 import ResponseHandler from './Response/Handler'
-import { client }  from 'websocket'
+import { client, w3cwebsocket }  from 'websocket'
 import _ from 'lodash'
 import OPS from './OPs'
 import CallAction from './CallAction'
+import prettyjson from 'prettyjson'
+import md5 from 'md5'
+import colors from 'colors'
 
 export default class Agent
 {
@@ -51,6 +54,33 @@ export default class Agent
      * @return {Void}
      */
     initSocket() {
+        return 'undefined' !== typeof window ? this.initBrowserSocket() : this.initNodeSocket()
+    }
+
+    initBrowserSocket() {
+        let client = new w3cwebsocket(this.url, 'cti-agent-protocol')
+        let self = this
+
+        client.onerror = function() {
+            console.log('Connection Error');
+        }
+
+        client.onopen = function() {
+            self.connection = connection
+
+            self.authorize()
+        }
+
+        client.onclose = function() {
+            console.log('echo-protocol Client Closed');
+        }
+
+        client.onmessage = function(message) {
+            self.handler.receive(message)
+        }
+    }
+
+    initNodeSocket() {
         this.socket = new client()
 
         this.socket.connect(this.url, 'cti-agent-protocol')
