@@ -9,6 +9,12 @@
     "start": "npm run build && node dist/index.js",
     "play": "node dist/index.js"
   },
+  "keywords": [
+    "ezvoicetek",
+    "acd",
+    "javascript",
+    "vue"
+  ],
   "author": "jocoonopa",
   "license": "ISC",
   "dependencies": {

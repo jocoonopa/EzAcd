@@ -230,8 +230,8 @@ var Agent = function () {
             return this.dispatch({
                 op: _OPs2.default.MAKE_CALL,
                 seq: seq,
-                tel: dn,
-                dn: this.ext
+                tel: dn
+                //dn: this.ext,
             });
         }
 
@@ -324,7 +324,7 @@ var Agent = function () {
 
             console.log(prettyjson.render(obj));
 
-            console.log('sned:  '.yellow + Agent.genSendStr(obj));
+            console.log("send:  \n".yellow + Agent.genSendStr(obj));
 
             return this.connection.send(Agent.genSendStr(obj));
         }

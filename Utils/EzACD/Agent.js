@@ -172,7 +172,7 @@ export default class Agent
             op: OPS.MAKE_CALL,
             seq,
             tel: dn,
-            dn: this.ext,
+            //dn: this.ext,
         })
     }
 
