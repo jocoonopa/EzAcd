@@ -1,6 +1,6 @@
 'use strict';
 
-var _EzACDAgent = require('./src/EzACDAgent');
+var _EzACDAgent = require('./EzACDAgent');
 
 var _EzACDAgent2 = _interopRequireDefault(_EzACDAgent);
 

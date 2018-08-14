@@ -1,0 +1,9 @@
+{
+    "domain": "{$DOMAIN}",
+    "port": "{$PORT}",
+    "password": "{$PASSWORD}",
+    "id": "{$AGENT_ID}",
+    "ext": "{$EXT}",
+    "center_id": "{$CENTER_ID}",
+    "ssl": true
+}
