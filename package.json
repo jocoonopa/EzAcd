@@ -1,6 +1,6 @@
 {
   "name": "ezvoicetek-ezacd-node-shell",
-  "version": "1.0.2-p4",
+  "version": "1.0.2-p5",
   "description": "ezacd 測試 shell",
   "main": "src/index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   "files": [
     "src"
   ],
-  "module": "src/index.js",
+  "module": "src/EzACDAgent.js",
   "author": "jocoonopa",
   "license": "ISC",
   "dependencies": {
