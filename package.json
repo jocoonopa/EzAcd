@@ -22,6 +22,7 @@
   "files": [
     "src"
   ],
+  "module": "src/index.js",
   "author": "jocoonopa",
   "license": "ISC",
   "dependencies": {
