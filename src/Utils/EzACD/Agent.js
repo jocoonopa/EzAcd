@@ -28,10 +28,11 @@ export default class Agent
     * @param  {Number} options.ext      [分機]
     * @param  {String} options.password [密碼]
     * @param  {String} options.centerId [Center Id]
+    * @param  {String} options.protocol [protocol]
     * @param  {Object} bus              [Vue instance]
     * @return {Void}
     */
-    constructor({ port, domain, id, ext, password, centerId }, bus) {
+    constructor({ port, domain, id, ext, password, centerId, protocol }, bus) {
         this.port = port
         this.domain = domain
         this.id = id
@@ -39,6 +40,7 @@ export default class Agent
         this.centerId = centerId
         this.ext = ext
         this.state = null
+        this.protocol = protocol
         this.cid = null
 
         this.initSocket()
@@ -58,24 +60,23 @@ export default class Agent
     }
 
     initBrowserSocket() {
-        let client = new w3cwebsocket(this.url, 'cti-agent-protocol')
         let self = this
 
-        client.onerror = function() {
+        this.connection = new w3cwebsocket(this.url, 'cti-agent-protocol')
+        
+        this.connection.onerror = function() {
             console.log('Connection Error');
         }
 
-        client.onopen = function() {
-            self.connection = connection
-
+        this.connection.onopen = function() {
             self.authorize()
         }
 
-        client.onclose = function() {
+        this.connection.onclose = function() {
             console.log('echo-protocol Client Closed');
         }
 
-        client.onmessage = function(message) {
+        this.connection.onmessage = function(message) {
             self.handler.receive(message)
         }
     }
