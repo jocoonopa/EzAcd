@@ -53,6 +53,12 @@ exports.default = [{
     code: _OPs2.default.DIAL_DTMF_RESPONSE,
     desc: 'DIAL-DTMF-RESPONSE'
 }, {
+    code: _OPs2.default.GET_DN_STATE,
+    desc: 'GET-DN-STATE'
+}, {
+    code: _OPs2.default.GET_DN_STATE_RESPONSE,
+    desc: 'GET-DN-STATE-RESPONSE'
+}, {
     code: _OPs2.default.CALL_ACTION,
     desc: 'CALL-ACTION'
 }, {

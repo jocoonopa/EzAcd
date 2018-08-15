@@ -72,6 +72,16 @@ export default [
     },
 
     {
+        code: OPs.GET_DN_STATE,
+        desc: 'GET-DN-STATE',
+    },
+
+    {
+        code: OPs.GET_DN_STATE_RESPONSE,
+        desc: 'GET-DN-STATE-RESPONSE',
+    },
+
+    {
         code: OPs.CALL_ACTION,
         desc: 'CALL-ACTION',
     },

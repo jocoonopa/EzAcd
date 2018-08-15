@@ -10,6 +10,7 @@ const commands = [
     'call:mute',
     'call:cancel',
     'dial {$char}',
+    'dn:state',
     'get {$key}',
     'get:state',
     'login', 
@@ -84,6 +85,10 @@ process.stdin.on('data', data => {
 
         case 'call:cancel':
             agent.cancel()
+        break
+
+        case 'dn:state':
+            agent.getDnState()
         break
 
         default:

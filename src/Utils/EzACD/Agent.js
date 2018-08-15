@@ -23,7 +23,7 @@ export default class Agent
     */
     /**
     * 初始化 Agent
-    * 
+    *
     * @param  {Number} options.port     [Server port]
     * @param  {String} options.domain   [Server domain]
     * @param  {String} options.id       [Agent Id]
@@ -52,7 +52,7 @@ export default class Agent
         this.seq = 0
         this.state = null
         this.callState = null
-        
+
         this.handler = new ResponseHandler(this, bus, isDebug)
     }
 
@@ -67,7 +67,7 @@ export default class Agent
 
     initBrowserSocket() {
         this.connection = new w3cwebsocket(this.url, 'cti-agent-protocol')
-        
+
         this.connection.onerror = error => {
             this.emit(Agent.events.SOCKET_ERROR, {
                 message: `Connection Error: ${error.toString()}`,
@@ -207,6 +207,19 @@ export default class Agent
     }
 
     /**
+     * 取得話機狀態
+     *
+     * @param  {Number} seq [Unique command sequence]
+     * @return {Void}
+     */
+    getDnState(seq) {
+        return this.dispatch({
+            op: OPS.GET_DN_STATE,
+            seq,
+        })
+    }
+
+    /**
      * Make call
      *
      * @param  {Number} options.dn   [Dial Number]
@@ -303,10 +316,10 @@ export default class Agent
 
                 tail = callActionDesc ? `: ${callActionDesc.desc}` : ` Unknown`
             }
-            
-            opDesc ? 
-                console.log(`\n${opDesc.desc}${tail} >>>>>>>>>>>>>>`.yellow) : 
-                console.log(`\nUnknown: (${obj.op})${tail} >>>>>>>>>>>>>>`.red) 
+
+            opDesc ?
+                console.log(`\n${opDesc.desc}${tail} >>>>>>>>>>>>>>`.yellow) :
+                console.log(`\nUnknown: (${obj.op})${tail} >>>>>>>>>>>>>>`.red)
 
             console.log(prettyjson.render(obj))
         }

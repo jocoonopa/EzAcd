@@ -211,6 +211,20 @@ export default class Handler
     }
 
     /**
+     * (4038) Get dn state response
+     *
+     * @param  {String} data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    getDnStateResponseHandler(data, isError) {
+        return this.emit({
+            eventName: this.cb.event,
+            withData: Adapter.toObj(data),
+        }, isError)
+    }
+
+    /**
      * (9001) This event will be send when:
      *     1. agent use Set Agent State to change state or
      *     2. server change agent state.
@@ -470,6 +484,12 @@ export default class Handler
                 op: OPS.CALL_ACTION_RESPONSE,
                 method: 'callActionResponseHandler',
                 event: 'call-action-response',
+            },
+
+            {
+                op: OPS.GET_DN_STATE_RESPONSE,
+                method: 'getDnStateResponseHandler',
+                event: 'get-dn-state-response',
             },
 
             {

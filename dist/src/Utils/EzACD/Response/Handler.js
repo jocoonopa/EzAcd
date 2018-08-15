@@ -270,6 +270,23 @@ var Handler = function () {
         }
 
         /**
+         * (4038) Get dn state response
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'getDnStateResponseHandler',
+        value: function getDnStateResponseHandler(data, isError) {
+            return this.emit({
+                eventName: this.cb.event,
+                withData: _Adapter2.default.toObj(data)
+            }, isError);
+        }
+
+        /**
          * (9001) This event will be send when:
          *     1. agent use Set Agent State to change state or
          *     2. server change agent state.
@@ -533,6 +550,10 @@ var Handler = function () {
                 op: _OPs2.default.CALL_ACTION_RESPONSE,
                 method: 'callActionResponseHandler',
                 event: 'call-action-response'
+            }, {
+                op: _OPs2.default.GET_DN_STATE_RESPONSE,
+                method: 'getDnStateResponseHandler',
+                event: 'get-dn-state-response'
             }, {
                 op: _OPs2.default.AGENT_STATE_CHANGE_EVENT, // 9001
                 method: 'agentStateChangeEventHandler',

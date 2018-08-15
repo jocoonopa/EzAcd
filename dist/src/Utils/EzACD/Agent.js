@@ -64,7 +64,7 @@ var Agent = function () {
     */
     /**
     * 初始化 Agent
-    * 
+    *
     * @param  {Number} options.port     [Server port]
     * @param  {String} options.domain   [Server domain]
     * @param  {String} options.id       [Agent Id]
@@ -285,6 +285,22 @@ var Agent = function () {
                 op: _OPs2.default.SET_CURRNET_AGENT_STATE,
                 seq: seq,
                 state: state
+            });
+        }
+
+        /**
+         * 取得話機狀態
+         *
+         * @param  {Number} seq [Unique command sequence]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'getDnState',
+        value: function getDnState(seq) {
+            return this.dispatch({
+                op: _OPs2.default.GET_DN_STATE,
+                seq: seq
             });
         }
 
