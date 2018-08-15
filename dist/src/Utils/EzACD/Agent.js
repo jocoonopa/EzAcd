@@ -14,6 +14,14 @@ var _Handler = require('./Response/Handler');
 
 var _Handler2 = _interopRequireDefault(_Handler);
 
+var _OpDescList = require('./OpDescList');
+
+var _OpDescList2 = _interopRequireDefault(_OpDescList);
+
+var _CallActionDescList = require('./CallActionDescList');
+
+var _CallActionDescList2 = _interopRequireDefault(_CallActionDescList);
+
 var _websocket = require('websocket');
 
 var _lodash = require('lodash');
@@ -63,16 +71,21 @@ var Agent = function () {
     * @param  {Number} options.ext      [分機]
     * @param  {String} options.password [密碼]
     * @param  {String} options.centerId [Center Id]
+    * @param  {String} options.protocol [protocol]
     * @param  {Object} bus              [Vue instance]
+    * @param  {Boolean} isDebug         [是否啟用除錯]
     * @return {Void}
     */
-    function Agent(_ref, bus) {
+    function Agent(_ref) {
         var port = _ref.port,
             domain = _ref.domain,
             id = _ref.id,
             ext = _ref.ext,
             password = _ref.password,
-            centerId = _ref.centerId;
+            centerId = _ref.centerId,
+            protocol = _ref.protocol;
+        var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
         _classCallCheck(this, Agent);
 
@@ -82,14 +95,18 @@ var Agent = function () {
         this.password = password;
         this.centerId = centerId;
         this.ext = ext;
-        this.state = null;
         this.cid = null;
+        this.protocol = protocol;
+        this.isDebug = isDebug;
 
         this.initSocket();
 
         /* init by self */
         this.seq = 0;
-        this.handler = new _Handler2.default(this, bus);
+        this.state = null;
+        this.callState = null;
+
+        this.handler = new _Handler2.default(this, bus, isDebug);
     }
 
     /**
@@ -107,53 +124,67 @@ var Agent = function () {
     }, {
         key: 'initBrowserSocket',
         value: function initBrowserSocket() {
-            var client = new _websocket.w3cwebsocket(this.url, 'cti-agent-protocol');
-            var self = this;
+            var _this = this;
 
-            client.onerror = function () {
-                console.log('Connection Error');
+            this.connection = new _websocket.w3cwebsocket(this.url, 'cti-agent-protocol');
+
+            this.connection.onerror = function (error) {
+                _this.emit(Agent.events.SOCKET_ERROR, {
+                    message: 'Connection Error: ' + error.toString()
+                });
             };
 
-            client.onopen = function () {
-                self.connection = connection;
-
-                self.authorize();
+            this.connection.onopen = function () {
+                return _this.authorize();
             };
 
-            client.onclose = function () {
-                console.log('echo-protocol Client Closed');
+            this.connection.onclose = function () {
+                _this.emit(Agent.events.SOCKET_CLOSED, {
+                    message: 'echo-protocol Client Closed'
+                });
             };
 
-            client.onmessage = function (message) {
-                self.handler.receive(message);
+            this.connection.onmessage = function (message) {
+                return _this.handler.receive(message);
             };
         }
     }, {
         key: 'initNodeSocket',
         value: function initNodeSocket() {
-            var _this = this;
+            var _this2 = this;
 
             this.socket = new _websocket.client();
 
             this.socket.connect(this.url, 'cti-agent-protocol');
 
             this.socket.on('connect', function (connection) {
-
-                _this.connection = connection;
+                _this2.connection = connection;
 
                 connection.on('message', function (message) {
-                    _this.handler.receive(message);
+                    _this2.handler.receive(message);
                 });
 
                 connection.on('error', function (error) {
-                    console.log("Connection Error: " + error.toString());
+                    if (_this2.isDebug) {
+                        console.log(('Connection Error: ' + error.toString()).red);
+                    }
+
+                    _this2.emit(Agent.events.SOCKET_ERROR, {
+                        message: 'Connection Error: ' + error.toString()
+                    });
                 });
 
                 connection.on('close', function () {
-                    console.log('echo-protocol Connection Closed');
+                    if (_this2.isDebug) {
+                        console.log('echo-protocol Client Closed'.cyan);
+                    }
+
+                    _this2.emit(Agent.events.SOCKET_CLOSED, {
+                        message: 'echo-protocol Client Closed'
+                    });
                 });
 
-                _this.authorize();
+                _this2.authorize();
             });
         }
 
@@ -272,7 +303,6 @@ var Agent = function () {
                 op: _OPs2.default.MAKE_CALL,
                 seq: seq,
                 tel: dn
-                //dn: this.ext,
             });
         }
 
@@ -306,7 +336,7 @@ var Agent = function () {
     }, {
         key: 'hold',
         value: function hold() {
-            return this.callAction(_CallAction2.default.HILD);
+            return this.callAction(_CallAction2.default.HOLD);
         }
     }, {
         key: 'mute',
@@ -363,11 +393,29 @@ var Agent = function () {
                 obj.seq = this.seq;
             }
 
-            console.log(_prettyjson2.default.render(obj));
+            if (this.isDebug) {
+                var opDesc = _lodash2.default.find(_OpDescList2.default, { code: obj.op });
+                var tail = '';
 
-            console.log("send:  \n".yellow + Agent.genSendStr(obj));
+                if (!_lodash2.default.isNil(obj.act)) {
+                    var callActionDesc = _lodash2.default.find(_CallActionDescList2.default, { code: Number(obj.act) });
+
+                    tail = callActionDesc ? ': ' + callActionDesc.desc : ' Unknown';
+                }
+
+                opDesc ? console.log(('\n' + opDesc.desc + tail + ' >>>>>>>>>>>>>>').yellow) : console.log(('\nUnknown: (' + obj.op + ')' + tail + ' >>>>>>>>>>>>>>').red);
+
+                console.log(_prettyjson2.default.render(obj));
+            }
 
             return this.connection.send(Agent.genSendStr(obj));
+        }
+    }, {
+        key: 'emit',
+        value: function emit(eventName, withData) {
+            if (this.bus) {
+                this.bus.$emit(eventName, withData);
+            }
         }
 
         /**
@@ -402,6 +450,14 @@ var Agent = function () {
             }
 
             return msg;
+        }
+    }, {
+        key: 'events',
+        get: function get() {
+            return {
+                SOCKET_ERROR: 'socket-error',
+                SOCKET_CLOSED: 'socket-closed'
+            };
         }
     }]);
 

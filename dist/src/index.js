@@ -4,9 +4,15 @@ var _EzACDAgent = require('./EzACDAgent');
 
 var _EzACDAgent2 = _interopRequireDefault(_EzACDAgent);
 
+var _prettyjson = require('prettyjson');
+
+var _prettyjson2 = _interopRequireDefault(_prettyjson);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 require('./bootstrap');
+
+var commands = ['call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'restart'];
 
 var agent = new _EzACDAgent2.default({
     port: config.port,
@@ -15,7 +21,7 @@ var agent = new _EzACDAgent2.default({
     ext: config.ext,
     password: config.password,
     centerId: config.center_id
-});
+}, null, config.isDebug);
 
 process.stdin.resume();
 process.stdin.setEncoding('utf8');
@@ -23,6 +29,10 @@ process.stdin.on('data', function (data) {
     var argvs = data.replace(/(?:\r\n|\r|\n)/g, '').split(' ');
 
     switch (argvs[0]) {
+        case 'restart':
+            agent.initSocket();
+            break;
+
         case 'login':
             agent.login();
             break;
@@ -72,11 +82,15 @@ process.stdin.on('data', function (data) {
             break;
 
         default:
-            console.log('No command founded'.red);
+            if (_.isNil(argvs[0]) || _.isEmpty(argvs[0])) {
+                return process.stdout.write('\n>>> ');
+            }
+
+            console.log(('\u6211\u4E0D\u77E5\u9053 \'' + argvs[0] + '\' \u662F\u4EC0\u5011').red);
+            console.log('以下是可用的指令:'.blue);
+            console.log(_prettyjson2.default.render(commands));
             break;
     }
 
-    //----------------------------------
-
-    process.stdout.write('>>> ');
+    process.stdout.write('\n>>> ');
 });

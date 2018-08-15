@@ -1,6 +1,23 @@
 require('./bootstrap')
 
 import EzACDAgent from './EzACDAgent'
+import prettyjson from 'prettyjson'
+
+const commands = [
+    'call:answer',
+    'call:hold',
+    'call:disconnect',
+    'call:mute',
+    'call:cancel',
+    'dial {$char}',
+    'get {$key}',
+    'get:state',
+    'login', 
+    'logout',
+    'make:call {$dn}',
+    'set:state {$state}',
+    'restart', 
+]
 
 let agent = new EzACDAgent({
     port: config.port,
@@ -9,7 +26,7 @@ let agent = new EzACDAgent({
     ext: config.ext,
     password: config.password,
     centerId: config.center_id,
-})
+}, null, config.isDebug)
 
 process.stdin.resume()
 process.stdin.setEncoding('utf8')
@@ -17,6 +34,10 @@ process.stdin.on('data', data => {
     let argvs = data.replace(/(?:\r\n|\r|\n)/g, '').split(' ')
 
     switch (argvs[0]) {
+        case 'restart':
+            agent.initSocket()
+        break
+
         case 'login':
             agent.login()
         break
@@ -66,11 +87,18 @@ process.stdin.on('data', data => {
         break
 
         default:
-            console.log('No command founded'.red)
+            if (_.isNil(argvs[0]) || _.isEmpty(argvs[0]))  {
+                return process.stdout.write(`\n>>> `)
+            }
+
+            console.log(`我不知道 '${argvs[0]}' 是什們`.red)
+            console.log('以下是可用的指令:'.blue)
+            console.log(prettyjson.render(commands))
         break
     }
 
-    //----------------------------------
-
-    process.stdout.write(`>>> `)
+    process.stdout.write(`\n>>> `)
 })
+
+
+ 

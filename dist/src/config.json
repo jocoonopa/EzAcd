@@ -5,5 +5,6 @@
     "id": "ag8261",
     "ext": 8261,
     "center_id": "democenter1",
-    "ssl": false
+    "ssl": false,
+    "isDebug": true
 }

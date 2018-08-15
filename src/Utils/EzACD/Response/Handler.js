@@ -1,5 +1,6 @@
 import OPS from '../OPs'
 import Adapter from './Adapter'
+import OpDescList from '../OpDescList'
 import prettyjson from 'prettyjson'
 import colors from 'colors'
 import _ from 'lodash'
@@ -7,12 +8,14 @@ import _ from 'lodash'
 export default class Handler
 {
     /**
-     * @param  {Object} agent [Adapter]
-     * @param  {Object|Null} bus   [Vue instance]
+     * @param  {Object}      agent    [Adapter]
+     * @param  {Object|Null} bus      [Vue instance]
+     * @param  {Boolean}     isDebug  [是否啟用除錯]
      */
-    constructor(agent, bus) {
+    constructor(agent, bus, isDebug = false) {
         this.agent = agent
         this.bus = bus
+        this.isDebug = isDebug
         this.cb = null
     }
 
@@ -24,96 +27,129 @@ export default class Handler
      */
     receive(evt) {
         let data = evt.data || evt.utf8Data
+        let obj = Adapter.toObj(data)
+        let op = Number(_.get(obj, 'op'))
+        let opDesc = _.find(OpDescList, { code: op })
 
         this.cb = _.find(this.cbs, {
-            op: Number(Adapter.get(data, 'op'))
+            op,
         })
 
-        if (!Adapter.isSuccess(data)) {
-            return this.emit({
-                eventName: _.isNil(this.cb) ? 'Unknown' : this.cb.event,
-                withData: Adapter.toObj(data),
-                error: true,
-            })
+        if (this.isDebug) {
+            opDesc ?
+                console.log(`\n<<<<<<<<<<<<<< ${opDesc.desc}`.cyan) :
+                console.log(`\n<<<<<<<<<<<<<< Unknown (${op})`.cyan)
+
+            console.log(prettyjson.render(obj))
         }
 
-        return !_.isNil(this.cb) && _.isFunction(this[this.cb.method]) ? this[this.cb.method](data) : null
+        return !_.isNil(this.cb) && _.isFunction(this[this.cb.method]) ?
+            this[this.cb.method](data, !Adapter.isSuccess(data)) :
+            this.unknownHandler(data)
+    }
+
+    /**
+     * Unknown handler
+     *
+     * @param  {String}  data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    unknownHandler(data, isError) {
+        return this.emit({
+            eventName: _.isNil(this.cb) ? 'Unknown' : this.cb.event,
+            withData: Adapter.toObj(data),
+        }, isError)
     }
 
     /**
      * (4001) Connect to ACD Server response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    authResponseHandler(data) {
+    authResponseHandler(data, isError) {
         this.agent.nonce = Adapter.get(data, 'nonce')
 
         return this.emit({
             eventName: this.cb.event,
             withData: Adapter.toObj(data),
-        })
+        }, isError)
     }
 
     /**
      * (4002) Login to ACD Server response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    loginResponseHandler(data) {
+    loginResponseHandler(data, isError) {
         return this.emit({
             eventName: this.cb.event,
             withData: Adapter.toObj(data),
-        })
+        }, isError)
     }
 
     /**
      * (4003) Logout from ACD Server response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    logoutResponseHandler(data) {
+    logoutResponseHandler(data, isError) {
         return this.emit({
             eventName: this.cb.event,
             withData: Adapter.toObj(data),
-        })
+        }, isError)
     }
 
     /**
      * (4010) Get agent state response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    currentAgentStateResponseHandler(data) {
+    currentAgentStateResponseHandler(data, isError) {
+        let obj = Adapter.toObj(data)
+
+        if (this.isDebug) {
+            this.printAgentState(Number(obj.state))
+        }
+
         return this.emit({
             eventName: this.cb.event,
-            withData: Adapter.toObj(data),
-        })
+            withData: obj,
+        }, isError)
     }
 
     /**
      * (4011) Set agent state response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    setCurrentAgentStateResponseHandler(data) {
+    setCurrentAgentStateResponseHandler(data, isError) {
+        let obj = Adapter.toObj(data)
+
         return this.emit({
             eventName: this.cb.event,
-            withData: Adapter.toObj(data),
-        })
+            withData: obj,
+        }, isError)
     }
 
     /**
      * (4030) Make call response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    makeCallResponseHandler(data) {
+    makeCallResponseHandler(data, isError) {
         let obj = Adapter.toObj(data)
 
         this.agent.cid = obj.cid
@@ -121,56 +157,57 @@ export default class Handler
         return this.emit({
             eventName: this.cb.event,
             withData: obj,
-        })
+        }, isError)
     }
 
     /**
      * (4031) Dial dtmf response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    dialDtmfResponseHandler(data) {
+    dialDtmfResponseHandler(data, isError) {
         return this.emit({
             eventName: this.cb.event,
             withData: Adapter.toObj(data),
-        })
+        }, isError)
     }
 
     /**
      * (4032) Call action response
      *
      * @param  {String} data
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    callActionResponseHandler(data) {
+    callActionResponseHandler(data, isError) {
         let obj = Adapter.toObj(data)
 
-        console.log('========= Call State ========='.blue)
-        console.log(prettyjson.render(obj))
-
-        switch (obj.state) {
-            case 0:
-                console.log('Call-State >>>>>  '.yellow + '<ANSWER>'.red)
-            break
-            case 1:
-                console.log('Call-State >>>>>  '.yellow + '<HOLD>'.red)
-            break
-            case 2:
-                console.log('Call-State >>>>>  '.yellow + '<DISCONNECT>'.red)
-            break
-            case 3:
-                console.log('Call-State >>>>>  '.yellow + '<MUTE>'.red)
-            break
-            case 4:
-                console.log('Call-State >>>>>  '.yellow + '<CANCEL>'.red)
-            break
+        if (this.isDebug) {
+            switch (obj.state) {
+                case 0:
+                    console.log('Call-Action =>  '.yellow + '<ANSWER>'.red)
+                break
+                case 1:
+                    console.log('Call-Action =>  '.yellow + '<HOLD>'.red)
+                break
+                case 2:
+                    console.log('Call-Action =>  '.yellow + '<DISCONNECT>'.red)
+                break
+                case 3:
+                    console.log('Call-Action =>  '.yellow + '<MUTE>'.red)
+                break
+                case 4:
+                    console.log('Call-Action =>  '.yellow + '<CANCEL>'.red)
+                break
+            }
         }
 
         return this.emit({
             eventName: this.cb.event,
             withData: Adapter.toObj(data),
-        })
+        }, isError)
     }
 
     /**
@@ -195,10 +232,26 @@ export default class Handler
     agentStateChangeEventHandler(data) {
         let obj = Adapter.toObj(data)
 
-        console.log('========= Agent State ========='.yellow)
-        console.log(prettyjson.render(obj))
+        this.agent.state = Number(obj.state)
 
-        switch(Number(obj.state)) {
+        if (this.isDebug) {
+            this.printAgentState(Number(obj.state))
+        }
+
+        return this.emit({
+            eventName: this.cb.event,
+            withData: Adapter.toObj(data),
+        })
+    }
+
+    /**
+     * 輸出 Agent 目前的狀態
+     * 
+     * @param  {Number} state
+     * @return {Void}
+     */
+    printAgentState(state) {
+        switch (state) {
             case 0:
                 console.log('Agent-State >>>>  '.yellow + 'Login'.red)
             break
@@ -212,15 +265,15 @@ export default class Handler
             break
 
             case 3:
-                 console.log('Agent-State >>>>  '.yellow + 'Ready'.red)
+                 console.log('Agent-State >>>>  '.yellow + 'Ready'.green)
             break
 
             case 4:
-                 console.log('Agent-State >>>>  '.yellow + 'Busy'.red)
+                 console.log('Agent-State >>>>  '.yellow + 'Busy'.magenta)
             break
 
             case 5:
-                 console.log('Agent-State >>>>  '.yellow + 'ACW'.red)
+                 console.log('Agent-State >>>>  '.yellow + 'ACW'.magenta)
             break
 
             case 6:
@@ -228,18 +281,17 @@ export default class Handler
             break
 
             case 7:
-                 console.log('Agent-State >>>>  '.yellow + 'Busy'.red)
+                 console.log('Agent-State >>>>  '.yellow + 'Un-exclusive Busy'.magenta)
             break
 
             case 8:
-                 console.log('Agent-State >>>>  '.yellow + 'Assigned'.red)
+                 console.log('Agent-State >>>>  '.yellow + 'Assigned'.magenta)
+            break
+
+            default:
+                console.log('Agent-State >>>>  '.yellow + 'Unknown'.red)
             break
         }
-
-        return this.emit({
-            eventName: this.cb.event,
-            withData: Adapter.toObj(data),
-        })
     }
 
     /**
@@ -284,14 +336,50 @@ export default class Handler
         let obj = Adapter.toObj(data)
         const DISCONNECT_STATE = 0
 
-        console.log('========= Call State ========='.pink)
+        if (this.isDebug) {
+            switch (Number(obj.state)) {
+                case 0x0:
+                    console.log('Call-State =>  '.yellow + 'Call is disconnected and became idle'.magenta)
+                break
 
-        console.log(prettyjson.render(obj))
+                case 0x1:
+                    console.log('Call-State =>  '.yellow + 'Call is ringing'.cyan)
+                break
+
+                case 0x2:
+                    console.log('Call-State =>  '.yellow + 'Call is connected'.green)
+                break
+
+                case 0x4:
+                    console.log('Call-State =>  '.yellow + 'Agent has been coached'.blue)
+                break
+
+                case 0x5:
+                    console.log('Call-State =>  '.yellow + 'Agent has forced to enter conference'.blue)
+                break
+
+                case 0x6:
+                    console.log('Call-State =>  '.yellow + 'Agent has been monitored'.blue)
+                break
+
+                case 0x7:
+                    console.log('Call-State => '.yellow + 'Agent ask supervisor to enter conference'.blue)
+                break
+
+                default:
+                    console.log('Call-State =>  '.yellow + 'Unknown'.red)
+                break
+            }
+        }
 
         // 掛斷時，將 cid 改為 null
         if (_.isEqual(Number(_.get(obj, 'state')), DISCONNECT_STATE)) {
             this.agent.cid = null
+        } else {
+            this.agent.cid = obj.cid
         }
+
+        this.agent.callState = Number(_.get(obj, 'state'))
 
         return this.emit({
             eventName: this.cb.event,
@@ -301,7 +389,7 @@ export default class Handler
 
     /**
      * (9004) Incoming call event
-     * 
+     *
      * @param  {String} data
      * @return {Mixed}
      */
@@ -317,14 +405,23 @@ export default class Handler
      *
      * @param  {String} options.eventName
      * @param  {Obj} options.withData
+     * @param  {Boolean} isError
      * @return {Mixed}
      */
-    emit({ eventName, withData }) {
+    emit({ eventName, withData }, isError = false) {
         if (this.bus) {
-            return this.bus.emit(eventName, withData)
+            return this.bus.$emit(eventName, {
+                data: withData,
+                error: true,
+            })
         }
     }
 
+    /**
+     * Callback mapped collection
+     *
+     * @return {Array} [{op:<op code> method:<callback method> event: <vue bus event-name>}]
+     */
     get cbs() {
         return [
             {

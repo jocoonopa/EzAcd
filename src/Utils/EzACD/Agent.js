@@ -1,5 +1,7 @@
 import ResponseAdapter from './Response/Adapter'
 import ResponseHandler from './Response/Handler'
+import OpDescList from './OpDescList'
+import CallActionDescList from './CallActionDescList'
 import { client, w3cwebsocket }  from 'websocket'
 import _ from 'lodash'
 import OPS from './OPs'
@@ -30,24 +32,28 @@ export default class Agent
     * @param  {String} options.centerId [Center Id]
     * @param  {String} options.protocol [protocol]
     * @param  {Object} bus              [Vue instance]
+    * @param  {Boolean} isDebug         [是否啟用除錯]
     * @return {Void}
     */
-    constructor({ port, domain, id, ext, password, centerId, protocol }, bus) {
+    constructor({ port, domain, id, ext, password, centerId, protocol }, bus = null, isDebug = false) {
         this.port = port
         this.domain = domain
         this.id = id
         this.password = password
         this.centerId = centerId
         this.ext = ext
-        this.state = null
-        this.protocol = protocol
         this.cid = null
+        this.protocol = protocol
+        this.isDebug = isDebug
 
         this.initSocket()
 
         /* init by self */
         this.seq = 0
-        this.handler = new ResponseHandler(this, bus)
+        this.state = null
+        this.callState = null
+        
+        this.handler = new ResponseHandler(this, bus, isDebug)
     }
 
     /**
@@ -60,25 +66,23 @@ export default class Agent
     }
 
     initBrowserSocket() {
-        let self = this
-
         this.connection = new w3cwebsocket(this.url, 'cti-agent-protocol')
         
-        this.connection.onerror = function() {
-            console.log('Connection Error');
+        this.connection.onerror = error => {
+            this.emit(Agent.events.SOCKET_ERROR, {
+                message: `Connection Error: ${error.toString()}`,
+            })
         }
 
-        this.connection.onopen = function() {
-            self.authorize()
+        this.connection.onopen = () => this.authorize()
+
+        this.connection.onclose = () => {
+            this.emit(Agent.events.SOCKET_CLOSED, {
+                message: 'echo-protocol Client Closed',
+            })
         }
 
-        this.connection.onclose = function() {
-            console.log('echo-protocol Client Closed');
-        }
-
-        this.connection.onmessage = function(message) {
-            self.handler.receive(message)
-        }
+        this.connection.onmessage = message => this.handler.receive(message)
     }
 
     initNodeSocket() {
@@ -87,7 +91,6 @@ export default class Agent
         this.socket.connect(this.url, 'cti-agent-protocol')
 
         this.socket.on('connect', connection => {
-
             this.connection = connection
 
             connection.on('message', message => {
@@ -95,11 +98,23 @@ export default class Agent
             })
 
             connection.on('error', error => {
-                console.log("Connection Error: " + error.toString())
+                if (this.isDebug) {
+                    console.log(`Connection Error: ${error.toString()}`.red)
+                }
+
+                this.emit(Agent.events.SOCKET_ERROR, {
+                    message: `Connection Error: ${error.toString()}`
+                })
             })
 
             connection.on('close', () => {
-                console.log('echo-protocol Connection Closed')
+                if (this.isDebug) {
+                    console.log(`echo-protocol Client Closed`.cyan)
+                }
+
+                this.emit(Agent.events.SOCKET_CLOSED, {
+                    message: 'echo-protocol Client Closed',
+                })
             })
 
             this.authorize()
@@ -203,7 +218,6 @@ export default class Agent
             op: OPS.MAKE_CALL,
             seq,
             tel: dn,
-            //dn: this.ext,
         })
     }
 
@@ -231,7 +245,7 @@ export default class Agent
     }
 
     hold() {
-        return this.callAction(CallAction.HILD)
+        return this.callAction(CallAction.HOLD)
     }
 
     mute() {
@@ -280,11 +294,30 @@ export default class Agent
             obj.seq = this.seq
         }
 
-        console.log(prettyjson.render(obj))
+        if (this.isDebug) {
+            let opDesc = _.find(OpDescList, { code: obj.op })
+            let tail = ''
 
-        console.log("send:  \n".yellow + Agent.genSendStr(obj))
+            if (!_.isNil(obj.act)) {
+                let callActionDesc = _.find(CallActionDescList, { code: Number(obj.act) })
+
+                tail = callActionDesc ? `: ${callActionDesc.desc}` : ` Unknown`
+            }
+            
+            opDesc ? 
+                console.log(`\n${opDesc.desc}${tail} >>>>>>>>>>>>>>`.yellow) : 
+                console.log(`\nUnknown: (${obj.op})${tail} >>>>>>>>>>>>>>`.red) 
+
+            console.log(prettyjson.render(obj))
+        }
 
         return this.connection.send(Agent.genSendStr(obj))
+    }
+
+    emit(eventName, withData) {
+        if (this.bus) {
+            this.bus.$emit(eventName, withData)
+        }
     }
 
     /**
@@ -301,6 +334,13 @@ export default class Agent
         }
 
         return msg
+    }
+
+    static get events() {
+        return {
+            SOCKET_ERROR: 'socket-error',
+            SOCKET_CLOSED: 'socket-closed',
+        }
     }
 
     get url() {
