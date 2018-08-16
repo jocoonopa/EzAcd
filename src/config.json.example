@@ -4,6 +4,7 @@
     "password": "{$PASSWORD}",
     "id": "{$AGENT_ID}",
     "ext": "{$EXT}",
+    "acd_dn": "{$ACD_DN}",
     "center_id": "{$CENTER_ID}",
     "ssl": true
 }

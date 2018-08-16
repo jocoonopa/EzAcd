@@ -30,12 +30,12 @@ export default class Agent
     * @param  {Number} options.ext      [分機]
     * @param  {String} options.password [密碼]
     * @param  {String} options.centerId [Center Id]
-    * @param  {String} options.protocol [protocol]
+    * @param  {Boolean} options.ssl      [ssl]
     * @param  {Object} bus              [Vue instance]
     * @param  {Boolean} isDebug         [是否啟用除錯]
     * @return {Void}
     */
-    constructor({ port, domain, id, ext, password, centerId, protocol }, bus = null, isDebug = false) {
+    constructor({ port, domain, id, ext, password, centerId, ssl }, bus = null, isDebug = false) {
         this.port = port
         this.domain = domain
         this.id = id
@@ -43,7 +43,7 @@ export default class Agent
         this.centerId = centerId
         this.ext = ext
         this.cid = null
-        this.protocol = protocol
+        this.protocol = ssl ? 'wss' : 'ws'
         this.isDebug = isDebug
 
         this.initSocket()
@@ -87,6 +87,10 @@ export default class Agent
 
     initNodeSocket() {
         this.socket = new client()
+
+        if (this.isDebug) {
+            console.log(`\n${this.url}\n\n`.yellow)
+        }
 
         this.socket.connect(this.url, 'cti-agent-protocol')
 
@@ -216,6 +220,21 @@ export default class Agent
         return this.dispatch({
             op: OPS.GET_DN_STATE,
             seq,
+        })
+    }
+
+    /**
+     * Query ACD Queued
+     * 
+     * @param  {Number} seq   [Unique command sequence]
+     * @param  {Number} dn [ACD DN to be queried]
+     * @return {Void}
+     */
+    queryAcdQueued(dn, seq) {
+        return this.dispatch({
+            op: OPS.QUERY_ACD_QUEUED,
+            seq,
+            dn,
         })
     }
 

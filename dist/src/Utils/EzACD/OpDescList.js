@@ -17,6 +17,12 @@ exports.default = [{
     code: _OPs2.default.CONNECT_TO_ACD_RESPONSE,
     desc: 'CONNECT-TO-ACD-RESPONSE'
 }, {
+    code: _OPs2.default.QUERY_ACD_QUEUED,
+    desc: 'QUERY-ACD-QUEUED'
+}, {
+    code: _OPs2.default.QUERY_ACD_QUEUED_RESPONSE,
+    desc: 'QUERY-ACD-QUEUED-RESPONSE'
+}, {
     code: _OPs2.default.AGENT_LOGIN,
     desc: 'AGENT-LOGIN'
 }, {

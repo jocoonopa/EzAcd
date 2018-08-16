@@ -287,6 +287,23 @@ var Handler = function () {
         }
 
         /**
+         * Query acd state response
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'queryAcdStateResponseHandler',
+        value: function queryAcdStateResponseHandler(data, isError) {
+            return this.emit({
+                eventName: this.cb.event,
+                withData: _Adapter2.default.toObj(data)
+            }, isError);
+        }
+
+        /**
          * (9001) This event will be send when:
          *     1. agent use Set Agent State to change state or
          *     2. server change agent state.
@@ -325,7 +342,7 @@ var Handler = function () {
 
         /**
          * 輸出 Agent 目前的狀態
-         * 
+         *
          * @param  {Number} state
          * @return {Void}
          */
@@ -534,6 +551,10 @@ var Handler = function () {
                 op: _OPs2.default.CURRENT_AGENT_STATE_RESPONSE,
                 method: 'currentAgentStateResponseHandler',
                 event: 'get-current-agent-state'
+            }, {
+                op: _OPs2.default.QUERY_ACD_QUEUED_RESPONSE,
+                method: 'queryAcdStateResponseHandler',
+                event: 'query-acd-state-response-handler'
             }, {
                 op: _OPs2.default.SET_CURRNET_AGENT_STATE_RESPONSE,
                 method: 'setCurrentAgentStateResponseHandler',

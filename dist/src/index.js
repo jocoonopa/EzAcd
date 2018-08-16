@@ -12,7 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 require('./bootstrap');
 
-var commands = ['call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'restart'];
+var commands = ['call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'query:acd', 'restart'];
 
 var agent = new _EzACDAgent2.default({
     port: config.port,
@@ -20,7 +20,8 @@ var agent = new _EzACDAgent2.default({
     id: config.id,
     ext: config.ext,
     password: config.password,
-    centerId: config.center_id
+    centerId: config.center_id,
+    ssl: config.ssl
 }, null, config.isDebug);
 
 process.stdin.resume();
@@ -62,7 +63,9 @@ process.stdin.on('data', function (data) {
             break;
 
         case 'call:answer':
-            agent.answer();
+            setTimeout(function () {
+                return agent.answer();
+            }, 2500);
             break;
 
         case 'call:hold':
@@ -83,6 +86,10 @@ process.stdin.on('data', function (data) {
 
         case 'dn:state':
             agent.getDnState();
+            break;
+
+        case 'query:acd':
+            agent.queryAcdQueued(_.get(argvs, 1));
             break;
 
         default:

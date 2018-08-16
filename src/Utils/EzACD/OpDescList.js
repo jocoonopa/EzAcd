@@ -12,6 +12,16 @@ export default [
     },
 
     {
+        code: OPs.QUERY_ACD_QUEUED,
+        desc: 'QUERY-ACD-QUEUED',
+    },
+
+    {
+        code: OPs.QUERY_ACD_QUEUED_RESPONSE,
+        desc: 'QUERY-ACD-QUEUED-RESPONSE',
+    },
+
+    {
         code: OPs.AGENT_LOGIN,
         desc: 'AGENT-LOGIN',
     },

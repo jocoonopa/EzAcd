@@ -17,6 +17,7 @@ const commands = [
     'logout',
     'make:call {$dn}',
     'set:state {$state}',
+    'query:acd',
     'restart', 
 ]
 
@@ -27,6 +28,7 @@ let agent = new EzACDAgent({
     ext: config.ext,
     password: config.password,
     centerId: config.center_id,
+    ssl: config.ssl,
 }, null, config.isDebug)
 
 process.stdin.resume()
@@ -68,7 +70,7 @@ process.stdin.on('data', data => {
         break
 
         case 'call:answer':
-            agent.answer()
+            setTimeout(() => agent.answer(), 2500)
         break
 
         case 'call:hold':
@@ -89,6 +91,10 @@ process.stdin.on('data', data => {
 
         case 'dn:state':
             agent.getDnState()
+        break
+
+        case 'query:acd':
+            agent.queryAcdQueued(_.get(argvs, 1))
         break
 
         default:

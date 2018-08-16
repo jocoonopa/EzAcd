@@ -71,7 +71,7 @@ var Agent = function () {
     * @param  {Number} options.ext      [分機]
     * @param  {String} options.password [密碼]
     * @param  {String} options.centerId [Center Id]
-    * @param  {String} options.protocol [protocol]
+    * @param  {Boolean} options.ssl      [ssl]
     * @param  {Object} bus              [Vue instance]
     * @param  {Boolean} isDebug         [是否啟用除錯]
     * @return {Void}
@@ -83,7 +83,7 @@ var Agent = function () {
             ext = _ref.ext,
             password = _ref.password,
             centerId = _ref.centerId,
-            protocol = _ref.protocol;
+            ssl = _ref.ssl;
         var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -96,7 +96,7 @@ var Agent = function () {
         this.centerId = centerId;
         this.ext = ext;
         this.cid = null;
-        this.protocol = protocol;
+        this.protocol = ssl ? 'wss' : 'ws';
         this.isDebug = isDebug;
 
         this.initSocket();
@@ -154,6 +154,10 @@ var Agent = function () {
             var _this2 = this;
 
             this.socket = new _websocket.client();
+
+            if (this.isDebug) {
+                console.log(('\n' + this.url + '\n\n').yellow);
+            }
 
             this.socket.connect(this.url, 'cti-agent-protocol');
 
@@ -301,6 +305,24 @@ var Agent = function () {
             return this.dispatch({
                 op: _OPs2.default.GET_DN_STATE,
                 seq: seq
+            });
+        }
+
+        /**
+         * Query ACD Queued
+         * 
+         * @param  {Number} seq   [Unique command sequence]
+         * @param  {Number} dn [ACD DN to be queried]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'queryAcdQueued',
+        value: function queryAcdQueued(dn, seq) {
+            return this.dispatch({
+                op: _OPs2.default.QUERY_ACD_QUEUED,
+                seq: seq,
+                dn: dn
             });
         }
 
