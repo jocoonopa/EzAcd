@@ -30,7 +30,7 @@ export default class Adapter
     static isSuccess(data) {
         let code = Adapter.get(data, 'code')
 
-        return _.isEqual(Number(code), 0)
+        return !_.isNil(code) && _.isEqual(Number(code), 0)
     }
 
     /**

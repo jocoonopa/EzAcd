@@ -33,9 +33,10 @@ export default class Agent
     * @param  {Boolean} options.ssl      [ssl]
     * @param  {Object} bus              [Vue instance]
     * @param  {Boolean} isDebug         [是否啟用除錯]
+    * @param  {Object} mockConnection     [方便測試用，初始化時不建立 socket]
     * @return {Void}
     */
-    constructor({ port, domain, id, ext, password, centerId, ssl }, bus = null, isDebug = false) {
+    constructor({ port, domain, id, ext, password, centerId, ssl }, bus = null, isDebug = false, mockConnection = null) {
         this.port = port
         this.domain = domain
         this.id = id
@@ -46,8 +47,9 @@ export default class Agent
         this.protocol = ssl ? 'wss' : 'ws'
         this.isDebug = isDebug
 
-        this.initSocket()
-
+        console.log('初始化...')
+        this.initSocket(mockConnection)
+        
         /* init by self */
         this.seq = 0
         this.state = null
@@ -59,10 +61,25 @@ export default class Agent
     /**
      * 建立 websocket
      *
+     * @param  {Object} mockConnection
      * @return {Void}
      */
-    initSocket() {
+    initSocket(mockConnection = null) {
+        if (this.connection) {
+            return
+        }
+
+        if (mockConnection) {
+            return this.initTestSocket(mockConnection)
+        }
+
         return 'undefined' !== typeof window ? this.initBrowserSocket() : this.initNodeSocket()
+    }
+
+    initTestSocket(mockConnection) {
+        this.connection = mockConnection
+
+        this.connection.on('message', message => this.handler.receive(message))
     }
 
     initBrowserSocket() {

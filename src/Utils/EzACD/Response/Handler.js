@@ -57,7 +57,7 @@ export default class Handler
      */
     unknownHandler(data, isError) {
         return this.emit({
-            eventName: _.isNil(this.cb) ? 'Unknown' : this.cb.event,
+            eventName: _.isNil(this.cb) ? 'Unknown' : _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -73,7 +73,7 @@ export default class Handler
         this.agent.nonce = Adapter.get(data, 'nonce')
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -87,7 +87,7 @@ export default class Handler
      */
     loginResponseHandler(data, isError) {
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -101,7 +101,7 @@ export default class Handler
      */
     logoutResponseHandler(data, isError) {
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -121,7 +121,7 @@ export default class Handler
         }
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: obj,
         }, isError)
     }
@@ -137,13 +137,15 @@ export default class Handler
         let obj = Adapter.toObj(data)
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: obj,
         }, isError)
     }
 
     /**
      * (4030) Make call response
+     *
+     * 更新 agent 的 cid
      *
      * @param  {String} data
      * @param  {Boolean} isError
@@ -155,7 +157,7 @@ export default class Handler
         this.agent.cid = obj.cid
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: obj,
         }, isError)
     }
@@ -169,7 +171,7 @@ export default class Handler
      */
     dialDtmfResponseHandler(data, isError) {
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -205,7 +207,7 @@ export default class Handler
         }
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -219,7 +221,7 @@ export default class Handler
      */
     getDnStateResponseHandler(data, isError) {
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -233,7 +235,7 @@ export default class Handler
      */
     queryAcdStateResponseHandler(data, isError) {
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         }, isError)
     }
@@ -267,7 +269,7 @@ export default class Handler
         }
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         })
     }
@@ -345,10 +347,10 @@ export default class Handler
                 SIP_PHONE_DIALING,
                 ACD_DN_QUEUE_COUNT_CHANGE,
             ],
-            _.get(obj, 'atype')
+            Number(_.get(obj, 'atype'))
         )) {
             return this.emit({
-                eventName: this.cb.event,
+                eventName: _.get(this.cb, 'event', 'Unknown'),
                 withData: obj,
             })
         }
@@ -401,16 +403,13 @@ export default class Handler
         }
 
         // 掛斷時，將 cid 改為 null
-        if (_.isEqual(Number(_.get(obj, 'state')), DISCONNECT_STATE)) {
-            this.agent.cid = null
-        } else {
-            this.agent.cid = obj.cid
-        }
+        this.agent.cid = _.isEqual(Number(_.get(obj, 'state')), DISCONNECT_STATE) ? null : obj.cid
 
+        // 更新 Call State
         this.agent.callState = Number(_.get(obj, 'state'))
 
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: obj,
         })
     }
@@ -423,7 +422,7 @@ export default class Handler
      */
     incomingCallEvent(data) {
         return this.emit({
-            eventName: this.cb.event,
+            eventName: _.get(this.cb, 'event', 'Unknown'),
             withData: Adapter.toObj(data),
         })
     }
