@@ -18,7 +18,7 @@ const commands = [
     'make:call {$dn}',
     'set:state {$state}',
     'query:acd',
-    'restart', 
+    'restart',
 ]
 
 let agent = new EzACDAgent({

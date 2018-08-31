@@ -120,4 +120,24 @@ export default [
         code: OPs.INCOMING_CALL_EVENT,
         desc: 'INCOMING-CALL-EVENT',
     },
+
+    {
+        code: OPs.MAKE_2ND_CALL,
+        desc: 'MAKE-2ND-CALL',
+    },
+
+    {
+        code: OPs.MAKE_2ND_CALL_RESPONSE,
+        desc: 'MAKE-2ND-CALL-RESPONSE',
+    },
+
+    {
+        code: OPs.MERGE_CALL_ACTION,
+        desc: 'MERGE-CALL-ACTION',
+    },
+
+    {
+        code: OPs.MERGE_CALL_ACTION_RESPONSE,
+        desc: 'MERGE-CALL-ACTION-RESPONSE',
+    },
 ]

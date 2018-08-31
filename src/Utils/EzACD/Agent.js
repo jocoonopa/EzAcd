@@ -6,6 +6,7 @@ import { client, w3cwebsocket }  from 'websocket'
 import _ from 'lodash'
 import OPS from './OPs'
 import CallAction from './CallAction'
+import MergeCallAction from './MergeCallAction'
 import prettyjson from 'prettyjson'
 import md5 from 'md5'
 import colors from 'colors'
@@ -47,9 +48,8 @@ export default class Agent
         this.protocol = ssl ? 'wss' : 'ws'
         this.isDebug = isDebug
 
-        console.log('初始化...')
         this.initSocket(mockConnection)
-        
+
         /* init by self */
         this.seq = 0
         this.state = null
@@ -242,7 +242,7 @@ export default class Agent
 
     /**
      * Query ACD Queued
-     * 
+     *
      * @param  {Number} seq   [Unique command sequence]
      * @param  {Number} dn [ACD DN to be queried]
      * @return {Void}
@@ -327,6 +327,74 @@ export default class Agent
             seq,
             act,
             cid: this.cid, // [cid 可以從 4030 (Make Call Response)取得]
+        })
+    }
+
+    /**
+     * This command is used when first call is connected
+     * and agent would like to make 2nd call for transfer,
+     * coach or conference etc.
+     *
+     * @param  {String}  tel  [dialed telephone number]
+     * @param  {String}  cid  [call id]
+     * @return {Void}
+     */
+    make2ndCall(tel, cid) {
+        return this.dispatch({
+            op: OPS.MAKE_2ND_CALL,
+            tel,
+            cid,
+        })
+    }
+
+    /**
+     * 轉接
+     *
+     * Disconnect agent's call leg and transfer it to 2nd call
+     *
+     * @param  {String} cid [call id]
+     * @return {Void}
+     */
+    transfer(cid) {
+        return this.mergeCallAction(MergeCallAction.TRANSFER, cid)
+    }
+
+    /**
+     * Conference
+     *
+     * Make 1st and 2nd call into conference.
+     * This command is not available for lite ACD version.
+     *
+     * @param  {String} cid [call id]
+     * @return {Void}
+     */
+    conference(cid) {
+        return this.mergeCallAction(MergeCallAction.CONFERENCE, cid)
+    }
+
+    /**
+     * Disconnect 2nd call and back to talk to customer (1st call)
+     *
+     * @param  {String} cid [call id]
+     * @return {Void}
+     */
+    disconnectMergeCall(cid) {
+        return this.mergeCallAction(MergeCallAction.DISCONNECT, cid)
+    }
+
+    /**
+     * This command is used to merge second call into first call.
+     * The action indicate the merge behavior to be done.
+     *
+     * @param  {Number} act [act code]
+     * @param  {String} cid [call id]
+     * @return {Void}
+     */
+    mergeCallAction(act, cid) {
+        return this.dispatch({
+            op: OPS.MERGE_CALL_ACTION,
+            act,
+            cid,
         })
     }
 

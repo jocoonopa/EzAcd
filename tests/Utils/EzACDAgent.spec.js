@@ -3,20 +3,18 @@ import Adapter from '../../src/Utils/EzACD/Response/Adapter'
 import { SocketIO, Server } from 'mock-socket'
 import sinon from 'sinon'
 let _ = require('lodash')
+import md5 from 'md5'
 let assert = require('assert')
 
 describe('Agent 單元測試', function () {
-    this.timeout(1000)
-
     global.config = require('../../src/config.json')
     let fakeURL = 'ws://localhost:8080'
     const mockServer = new Server(fakeURL)
     let socketStub = new SocketIO(fakeURL)
 
-    socketStub.send = function(message) {
+    socketStub.send = message => {
         socketStub.emit('message', message)
     }
-
     socketStub.connect = () => {}
 
     let agent = null
@@ -34,6 +32,10 @@ describe('Agent 單元測試', function () {
         'cancel',
         'getDnState',
         'queryAcdQueued',
+        'make2ndCall',
+        'transfer',
+        'conference',
+        'disconnectMergeCall',
     ]
 
     describe('Socket message send', () => {
@@ -75,6 +77,16 @@ describe('Agent 單元測試', function () {
             let resultString = Agent.genSendStr(inputObj)
 
             assert.equal(resultString, "a=b\nc=d\ne=f\n")
+        })
+    })
+
+    describe('參數屬性測試', () => {
+        it('檢查 url 組合是否正確', () => {
+            assert.equal(agent.url, `${agent.protocol}://${agent.domain}:${agent.port}`)
+        })
+
+        it('檢查 auth 組合是否正確', () => {
+            assert.equal(agent.auth, md5(`${agent.ag}${agent.nonce}${agent.password}`))
         })
     })
 })

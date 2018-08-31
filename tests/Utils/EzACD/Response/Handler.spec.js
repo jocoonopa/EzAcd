@@ -6,11 +6,18 @@ let _ = require('lodash')
 let assert = require('assert')
 
 describe('Handler 單元測試', () => {
+    /**
+     * Handler 處理的項目
+     * 
+     * @type {Array}
+     */
     let handableOps = [
         OPS.CONNECT_TO_ACD_RESPONSE,
         OPS.AGENT_LOGIN_RESPONSE,
         OPS.AGENT_LOGOUT_RESPONSE,
         OPS.CURRENT_AGENT_STATE_RESPONSE,
+        OPS.MAKE_2ND_CALL_RESPONSE,
+        OPS.MERGE_CALL_ACTION_RESPONSE,
         OPS.QUERY_ACD_QUEUED_RESPONSE,
         OPS.SET_CURRNET_AGENT_STATE_RESPONSE,
         OPS.MAKE_CALL_RESPONSE,

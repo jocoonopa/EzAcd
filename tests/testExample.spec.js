@@ -1,23 +1,7 @@
 let assert = require('assert')
 
 // BDD Style
-describe('基本測試', () => {
-    before(function() {
-        // runs before all tests in this block
-    })
-
-    after(function() {
-        // runs after all tests in this block
-    })
-
-    beforeEach(function() {
-        // runs before each test in this block
-    })
-
-    afterEach(function() {
-        // runs after each test in this block
-    })
-
+describe('確認測試可運行', () => {
     describe('#indexOf()', () => {
         it('should return -1 when the value is not present', function(done) {
             assert.equal(
@@ -53,12 +37,16 @@ describe('基本測試', () => {
         // 限制測試時間要在多少秒內完成
         this.timeout(500)
 
-        it('should take less than 500ms', function(done){
-            setTimeout(done, 400)
+        it('should take less than 100ms', function(done){
+            setTimeout(done, 100)
         })
 
-        it('should take less than 500ms as well', function(done){
-            setTimeout(done, 250)
+        it('should take less than 200ms as well', function(done){
+            setTimeout(done, 200)
+        })
+
+        it('should take less than 300ms', function(done){
+            setTimeout(done, 300)
         })
     })
 })

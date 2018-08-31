@@ -1,6 +1,6 @@
-import OPS from '../OPs'
 import Adapter from './Adapter'
 import OpDescList from '../OpDescList'
+import ResponseHandlerMap from './ResponseHandlerMap'
 import prettyjson from 'prettyjson'
 import colors from 'colors'
 import _ from 'lodash'
@@ -56,10 +56,7 @@ export default class Handler
      * @return {Mixed}
      */
     unknownHandler(data, isError) {
-        return this.emit({
-            eventName: _.isNil(this.cb) ? 'Unknown' : _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -72,10 +69,7 @@ export default class Handler
     authResponseHandler(data, isError) {
         this.agent.nonce = Adapter.get(data, 'nonce')
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -86,10 +80,7 @@ export default class Handler
      * @return {Mixed}
      */
     loginResponseHandler(data, isError) {
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -100,10 +91,7 @@ export default class Handler
      * @return {Mixed}
      */
     logoutResponseHandler(data, isError) {
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -120,10 +108,7 @@ export default class Handler
             this.printAgentState(Number(obj.state))
         }
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: obj,
-        }, isError)
+        return this.emitViaBus(obj, isError)
     }
 
     /**
@@ -136,10 +121,7 @@ export default class Handler
     setCurrentAgentStateResponseHandler(data, isError) {
         let obj = Adapter.toObj(data)
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: obj,
-        }, isError)
+        return this.emitViaBus(obj, isError)
     }
 
     /**
@@ -156,10 +138,7 @@ export default class Handler
 
         this.agent.cid = obj.cid
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: obj,
-        }, isError)
+        return this.emitViaBus(obj, isError)
     }
 
     /**
@@ -170,10 +149,7 @@ export default class Handler
      * @return {Mixed}
      */
     dialDtmfResponseHandler(data, isError) {
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -206,10 +182,7 @@ export default class Handler
             }
         }
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -220,10 +193,7 @@ export default class Handler
      * @return {Mixed}
      */
     getDnStateResponseHandler(data, isError) {
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -234,10 +204,29 @@ export default class Handler
      * @return {Mixed}
      */
     queryAcdStateResponseHandler(data, isError) {
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        }, isError)
+        return this.emitViaBus(Adapter.toObj(data), isError)
+    }
+
+    /**
+     * make2ndCallResponse
+     *
+     * @param  {String} data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    make2ndCallResponse(data, isError) {
+        return this.emitViaBus(Adapter.toObj(data), isError)
+    }
+
+    /**
+     * mergeCallActionResponse
+     *
+     * @param  {String} data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    mergeCallActionResponse(data, isError) {
+        return this.emitViaBus(Adapter.toObj(data), isError)
     }
 
     /**
@@ -268,10 +257,7 @@ export default class Handler
             this.printAgentState(Number(obj.state))
         }
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        })
+        return this.emitViaBus(Adapter.toObj(data))
     }
 
     /**
@@ -349,10 +335,7 @@ export default class Handler
             ],
             Number(_.get(obj, 'atype'))
         )) {
-            return this.emit({
-                eventName: _.get(this.cb, 'event', 'Unknown'),
-                withData: obj,
-            })
+            return this.emitViaBus(obj)
         }
     }
 
@@ -408,10 +391,7 @@ export default class Handler
         // 更新 Call State
         this.agent.callState = Number(_.get(obj, 'state'))
 
-        return this.emit({
-            eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: obj,
-        })
+        return this.emitViaBus(obj)
     }
 
     /**
@@ -421,10 +401,20 @@ export default class Handler
      * @return {Mixed}
      */
     incomingCallEvent(data) {
+        return this.emitViaBus(Adapter.toObj(data))
+    }
+
+    /**
+     * Emit via bus
+     *
+     * @param  {Object} obj
+     * @return {Void}
+     */
+    emitViaBus(obj, isError = false) {
         return this.emit({
             eventName: _.get(this.cb, 'event', 'Unknown'),
-            withData: Adapter.toObj(data),
-        })
+            withData: obj,
+        }, isError)
     }
 
     /**
@@ -450,90 +440,6 @@ export default class Handler
      * @return {Array} [{op:<op code> method:<callback method> event: <vue bus event-name>}]
      */
     get cbs() {
-        return [
-            {
-                op: OPS.CONNECT_TO_ACD_RESPONSE,
-                method: 'authResponseHandler',
-                event: 'auth',
-            },
-
-            {
-                op: OPS.AGENT_LOGIN_RESPONSE,
-                method: 'loginResponseHandler',
-                event: 'login',
-            },
-
-            {
-                op: OPS.AGENT_LOGOUT_RESPONSE,
-                method: 'logoutResponseHandler',
-                event: 'logout',
-            },
-
-            {
-                op: OPS.CURRENT_AGENT_STATE_RESPONSE,
-                method: 'currentAgentStateResponseHandler',
-                event: 'get-current-agent-state',
-            },
-
-            {
-                op: OPS.QUERY_ACD_QUEUED_RESPONSE,
-                method: 'queryAcdStateResponseHandler',
-                event: 'query-acd-state-response-handler',
-            },
-
-            {
-                op: OPS.SET_CURRNET_AGENT_STATE_RESPONSE,
-                method: 'setCurrentAgentStateResponseHandler',
-                event: 'set-current-agent-state-eesponse',
-            },
-
-            {
-                op: OPS.MAKE_CALL_RESPONSE,
-                method: 'makeCallResponseHandler',
-                event: 'make-call-response',
-            },
-
-            {
-                op: OPS.DIAL_DTMF_RESPONSE,
-                method: 'dialDtmfResponseHandler',
-                event: 'dial-dtmf-response',
-            },
-
-            {
-                op: OPS.CALL_ACTION_RESPONSE,
-                method: 'callActionResponseHandler',
-                event: 'call-action-response',
-            },
-
-            {
-                op: OPS.GET_DN_STATE_RESPONSE,
-                method: 'getDnStateResponseHandler',
-                event: 'get-dn-state-response',
-            },
-
-            {
-                op: OPS.AGENT_STATE_CHANGE_EVENT, // 9001
-                method: 'agentStateChangeEventHandler',
-                event: 'agent-state-change-event',
-            },
-
-            {
-                op: OPS.MESSAGE_RECEIVE_EVENT, // 9002
-                method: 'messageReceiveEvent',
-                event: 'message-receive-event',
-            },
-
-            {
-                op: OPS.CALL_STATE_CHANGE_EVENT, // 9003
-                method: 'callStateChangeEvent',
-                event: 'state-change-event',
-            },
-
-            {
-                op: OPS.INCOMING_CALL_EVENT, // 9004
-                method: 'incomingCallEvent',
-                event: 'incoming-call-event',
-            },
-        ]
+        return ResponseHandlerMap
     }
 }
