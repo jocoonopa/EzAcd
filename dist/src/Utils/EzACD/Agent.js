@@ -631,8 +631,7 @@ var Agent = function () {
 
             return this.dispatch({
                 op: _OPs2.default.GET_AGENT_PERFORMANCE,
-                seq: 1213333,
-                ag: ag,
+                ag: ag ? ag : this.id,
                 type: type
             });
         }

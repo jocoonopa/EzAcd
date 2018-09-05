@@ -482,7 +482,7 @@ export default class Agent
     getAgentPerformance(ag = null, type) {
         return this.dispatch({
             op: OPS.GET_AGENT_PERFORMANCE,
-            ag,
+            ag: ag ? ag : this.id,
             type,
         })
     }
