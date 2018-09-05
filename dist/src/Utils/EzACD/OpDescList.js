@@ -50,6 +50,9 @@ exports.default = [{
     code: _OPs2.default.MAKE_CALL,
     desc: 'MAKE-CALL'
 }, {
+    code: _OPs2.default.GET_DN_PERFORMANCE,
+    desc: 'GET-DN-PERFORMANCE'
+}, {
     code: _OPs2.default.MAKE_CALL_RESPONSE,
     desc: 'MAKE-CALL-RESPONSE'
 }, {
@@ -64,6 +67,24 @@ exports.default = [{
 }, {
     code: _OPs2.default.GET_DN_STATE_RESPONSE,
     desc: 'GET-DN-STATE-RESPONSE'
+}, {
+    code: _OPs2.default.GET_DN_PERFORMANCE,
+    desc: 'GET-DN-PERFORMANCE'
+}, {
+    code: _OPs2.default.GET_DN_PERFORMANCE_RESPONSE,
+    desc: 'GET-DN-PERFORMANCE-RESPONSE'
+}, {
+    code: _OPs2.default.GET_AGENT_PERFORMANCE,
+    desc: 'GET-AGENT-PERFORMANCE'
+}, {
+    code: _OPs2.default.GET_AGENT_PERFORMANCE_RESPONSE,
+    desc: 'GET-AGENT-PERFORMANCE-RESPONSE'
+}, {
+    code: _OPs2.default.GET_AGENT_GROUP_PERFORMANCE,
+    desc: 'GET-AGENT-GROUP-PERFORMANCE'
+}, {
+    code: _OPs2.default.GET_AGENT_GROUP_PERFORMANCE_RESPONSE,
+    desc: 'GET-AGENT-GROUP-PERFORMANCE-RESPONSE'
 }, {
     code: _OPs2.default.CALL_ACTION,
     desc: 'CALL-ACTION'
@@ -82,4 +103,16 @@ exports.default = [{
 }, {
     code: _OPs2.default.INCOMING_CALL_EVENT,
     desc: 'INCOMING-CALL-EVENT'
+}, {
+    code: _OPs2.default.MAKE_2ND_CALL,
+    desc: 'MAKE-2ND-CALL'
+}, {
+    code: _OPs2.default.MAKE_2ND_CALL_RESPONSE,
+    desc: 'MAKE-2ND-CALL-RESPONSE'
+}, {
+    code: _OPs2.default.MERGE_CALL_ACTION,
+    desc: 'MERGE-CALL-ACTION'
+}, {
+    code: _OPs2.default.MERGE_CALL_ACTION_RESPONSE,
+    desc: 'MERGE-CALL-ACTION-RESPONSE'
 }];

@@ -348,6 +348,25 @@ export default class Agent
     }
 
     /**
+     * Get Agent Group List (3021)
+     *
+     * This command is used to get real time agent state from ACD server.
+     * There are different type of information could be returned depending
+     * on request type.
+     *
+     * @param  {String} agroup
+     * @param  {Number} type
+     * @return {Void}
+     */
+    getAgentGroupList(agroup, type) {
+        return this.dispatch({
+            op: OPS.GET_AGENT_GROUP_LIST,
+            agroup,
+            type,
+        })
+    }
+
+    /**
      * 轉接
      *
      * Disconnect agent's call leg and transfer it to 2nd call
@@ -395,6 +414,76 @@ export default class Agent
             op: OPS.MERGE_CALL_ACTION,
             act,
             cid,
+        })
+    }
+
+    /**
+     * Get DN Performance (3050)
+     *
+     * This command is used to query the the ACD-DN
+     * real time performance from server.
+     *
+     * only hourly performance (type=1) can have those real time information:
+     * f_queued, f_longest_waiting,f_alarm
+     *
+     * @param  {String} dn   [Queried ACD DN Number]
+     * @param  {Number} type [0:quarterly, 1:hourly, 2:daily]
+     * @param  {Number} fmt  [
+     *     0: (default, backward compatible full format)
+     *     1: wallboard format 1
+     *     2: wallboard format 2
+     * ]
+     * @return {Void}
+     */
+    getDnPerformance(dn, type = 1, fmt = 0) {
+        return this.dispatch({
+            op: OPS.GET_DN_PERFORMANCE,
+            type,
+            fmt,
+        })
+    }
+
+    /**
+     * Get Agent Group Performance(3051)
+     *
+     * This command is used to query the the Agent Group real time
+     * performance from server
+     *
+     * @param  {Number} agroup  [Agent Group ID to be Queried]
+     * @param  {Number} type [0:quarterly, 1:hourly, 2:daily]
+     * @param  {Number} fmt  [
+     *     0: (default, backward compatible full format)
+     *     1: wallboard format 1
+     *     2: wallboard format 2
+     * ]
+     * @return {Void}
+     */
+    getAgentGroupPerformance(agroup, type = 1, fmt = 0) {
+        return this.dispatch({
+            op: OPS.GET_AGENT_GROUP_PERFORMANCE_RESPONSE,
+            agroup,
+            type,
+            fmt,
+        })
+    }
+
+    /**
+     * Get Agent Performance (3052)
+     *
+     * This command is used to query the the Agent real time performance from server.
+     *
+     * @param  {String} ag   [
+     *   Optional, if supervisor would like to query
+     *   other agent's performance
+     * ]
+     * @param  {Number} type [0:quarterly, 1:hourly, 2:daily]
+     * @return {Void}
+     */
+    getAgentPerformance(ag = null, type) {
+        return this.dispatch({
+            op: OPS.GET_AGENT_PERFORMANCE,
+            ag,
+            type,
         })
     }
 

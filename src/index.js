@@ -4,6 +4,8 @@ import EzACDAgent from './EzACDAgent'
 import prettyjson from 'prettyjson'
 
 const commands = [
+    'acd:performance {$dn}',
+    'agent:performance',
     'call:answer',
     'call:hold',
     'call:disconnect',
@@ -91,6 +93,10 @@ process.stdin.on('data', data => {
 
         case 'dn:state':
             agent.getDnState()
+        break
+
+        case 'agent:performance':
+            agent.getAgentPerformance(null, 1)
         break
 
         case 'query:acd':

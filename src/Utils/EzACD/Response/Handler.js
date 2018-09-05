@@ -230,6 +230,50 @@ export default class Handler
     }
 
     /**
+     * getAgentGroupListResponse
+     *
+     * @param  {String}  data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    getAgentGroupListResponse(data, isError) {
+        return this.emitViaBus(Adapter.toObj(data), isError)
+    }
+
+    /**
+     * getDnPerformanceResponse
+     *
+     * @param  {String} data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    getDnPerformanceResponse(data, isError) {
+        return this.emitViaBus(Adapter.toObj(data), isError)
+    }
+
+    /**
+     * getAgentPerformanceResponse
+     *
+     * @param  {String} data
+     * @param  {Boolean} isError
+     * @return {Void]}
+     */
+    getAgentPerformanceResponse(data, isError) {
+        return this.emitViaBus(Adapter.toObj(data), isError)
+    }
+
+    /**
+     * getAgentGroupPerformanceResponse
+     *
+     * @param  {String} data
+     * @param  {Boolean} isError
+     * @return {Mixed}
+     */
+    getAgentGroupPerformanceResponse(data, isError) {
+        return this.emitViaBus(Adapter.toObj(data), isError)
+    }
+
+    /**
      * (9001) This event will be send when:
      *     1. agent use Set Agent State to change state or
      *     2. server change agent state.

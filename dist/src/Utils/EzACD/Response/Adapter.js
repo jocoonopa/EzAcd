@@ -53,7 +53,7 @@ var Adapter = function () {
         value: function isSuccess(data) {
             var code = Adapter.get(data, 'code');
 
-            return _lodash2.default.isEqual(Number(code), 0);
+            return !_lodash2.default.isNil(code) && _lodash2.default.isEqual(Number(code), 0);
         }
 
         /**

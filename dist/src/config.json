@@ -1,9 +1,9 @@
 {
     "domain": "ezdemo.ezvoicetek.com",
     "port": 2085,
-    "password": "ag8261",
-    "id": "ag8261",
-    "ext": 8261,
+    "password": "ag8260",
+    "id": "ag8260",
+    "ext": 8260,
     "center_id": "democenter1",
     "ssl": false,
     "isDebug": true

@@ -6,10 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _OPs = require('../OPs');
-
-var _OPs2 = _interopRequireDefault(_OPs);
-
 var _Adapter = require('./Adapter');
 
 var _Adapter2 = _interopRequireDefault(_Adapter);
@@ -17,6 +13,10 @@ var _Adapter2 = _interopRequireDefault(_Adapter);
 var _OpDescList = require('../OpDescList');
 
 var _OpDescList2 = _interopRequireDefault(_OpDescList);
+
+var _ResponseHandlerMap = require('./ResponseHandlerMap');
+
+var _ResponseHandlerMap2 = _interopRequireDefault(_ResponseHandlerMap);
 
 var _prettyjson = require('prettyjson');
 
@@ -91,10 +91,7 @@ var Handler = function () {
     }, {
         key: 'unknownHandler',
         value: function unknownHandler(data, isError) {
-            return this.emit({
-                eventName: _lodash2.default.isNil(this.cb) ? 'Unknown' : this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -110,10 +107,7 @@ var Handler = function () {
         value: function authResponseHandler(data, isError) {
             this.agent.nonce = _Adapter2.default.get(data, 'nonce');
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -127,10 +121,7 @@ var Handler = function () {
     }, {
         key: 'loginResponseHandler',
         value: function loginResponseHandler(data, isError) {
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -144,10 +135,7 @@ var Handler = function () {
     }, {
         key: 'logoutResponseHandler',
         value: function logoutResponseHandler(data, isError) {
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -167,10 +155,7 @@ var Handler = function () {
                 this.printAgentState(Number(obj.state));
             }
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: obj
-            }, isError);
+            return this.emitViaBus(obj, isError);
         }
 
         /**
@@ -186,14 +171,13 @@ var Handler = function () {
         value: function setCurrentAgentStateResponseHandler(data, isError) {
             var obj = _Adapter2.default.toObj(data);
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: obj
-            }, isError);
+            return this.emitViaBus(obj, isError);
         }
 
         /**
          * (4030) Make call response
+         *
+         * 更新 agent 的 cid
          *
          * @param  {String} data
          * @param  {Boolean} isError
@@ -207,10 +191,7 @@ var Handler = function () {
 
             this.agent.cid = obj.cid;
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: obj
-            }, isError);
+            return this.emitViaBus(obj, isError);
         }
 
         /**
@@ -224,10 +205,7 @@ var Handler = function () {
     }, {
         key: 'dialDtmfResponseHandler',
         value: function dialDtmfResponseHandler(data, isError) {
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -263,10 +241,7 @@ var Handler = function () {
                 }
             }
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -280,10 +255,7 @@ var Handler = function () {
     }, {
         key: 'getDnStateResponseHandler',
         value: function getDnStateResponseHandler(data, isError) {
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -297,10 +269,91 @@ var Handler = function () {
     }, {
         key: 'queryAcdStateResponseHandler',
         value: function queryAcdStateResponseHandler(data, isError) {
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            }, isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+        }
+
+        /**
+         * make2ndCallResponse
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'make2ndCallResponse',
+        value: function make2ndCallResponse(data, isError) {
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+        }
+
+        /**
+         * mergeCallActionResponse
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'mergeCallActionResponse',
+        value: function mergeCallActionResponse(data, isError) {
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+        }
+
+        /**
+         * getAgentGroupListResponse
+         *
+         * @param  {String}  data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'getAgentGroupListResponse',
+        value: function getAgentGroupListResponse(data, isError) {
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+        }
+
+        /**
+         * getDnPerformanceResponse
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'getDnPerformanceResponse',
+        value: function getDnPerformanceResponse(data, isError) {
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+        }
+
+        /**
+         * getAgentPerformanceResponse
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Void]}
+         */
+
+    }, {
+        key: 'getAgentPerformanceResponse',
+        value: function getAgentPerformanceResponse(data, isError) {
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+        }
+
+        /**
+         * getAgentGroupPerformanceResponse
+         *
+         * @param  {String} data
+         * @param  {Boolean} isError
+         * @return {Mixed}
+         */
+
+    }, {
+        key: 'getAgentGroupPerformanceResponse',
+        value: function getAgentGroupPerformanceResponse(data, isError) {
+            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
         }
 
         /**
@@ -334,10 +387,7 @@ var Handler = function () {
                 this.printAgentState(Number(obj.state));
             }
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            });
+            return this.emitViaBus(_Adapter2.default.toObj(data));
         }
 
         /**
@@ -414,11 +464,8 @@ var Handler = function () {
 
             var obj = _Adapter2.default.toObj(data);
 
-            if (_lodash2.default.includes([SIP_PHONE_DIALING, ACD_DN_QUEUE_COUNT_CHANGE], _lodash2.default.get(obj, 'atype'))) {
-                return this.emit({
-                    eventName: this.cb.event,
-                    withData: obj
-                });
+            if (_lodash2.default.includes([SIP_PHONE_DIALING, ACD_DN_QUEUE_COUNT_CHANGE], Number(_lodash2.default.get(obj, 'atype')))) {
+                return this.emitViaBus(obj);
             }
         }
 
@@ -472,18 +519,12 @@ var Handler = function () {
             }
 
             // 掛斷時，將 cid 改為 null
-            if (_lodash2.default.isEqual(Number(_lodash2.default.get(obj, 'state')), DISCONNECT_STATE)) {
-                this.agent.cid = null;
-            } else {
-                this.agent.cid = obj.cid;
-            }
+            this.agent.cid = _lodash2.default.isEqual(Number(_lodash2.default.get(obj, 'state')), DISCONNECT_STATE) ? null : obj.cid;
 
+            // 更新 Call State
             this.agent.callState = Number(_lodash2.default.get(obj, 'state'));
 
-            return this.emit({
-                eventName: this.cb.event,
-                withData: obj
-            });
+            return this.emitViaBus(obj);
         }
 
         /**
@@ -496,10 +537,25 @@ var Handler = function () {
     }, {
         key: 'incomingCallEvent',
         value: function incomingCallEvent(data) {
+            return this.emitViaBus(_Adapter2.default.toObj(data));
+        }
+
+        /**
+         * Emit via bus
+         *
+         * @param  {Object} obj
+         * @return {Void}
+         */
+
+    }, {
+        key: 'emitViaBus',
+        value: function emitViaBus(obj) {
+            var isError = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
             return this.emit({
-                eventName: this.cb.event,
-                withData: _Adapter2.default.toObj(data)
-            });
+                eventName: _lodash2.default.get(this.cb, 'event', 'Unknown'),
+                withData: obj
+            }, isError);
         }
 
         /**
@@ -535,63 +591,7 @@ var Handler = function () {
     }, {
         key: 'cbs',
         get: function get() {
-            return [{
-                op: _OPs2.default.CONNECT_TO_ACD_RESPONSE,
-                method: 'authResponseHandler',
-                event: 'auth'
-            }, {
-                op: _OPs2.default.AGENT_LOGIN_RESPONSE,
-                method: 'loginResponseHandler',
-                event: 'login'
-            }, {
-                op: _OPs2.default.AGENT_LOGOUT_RESPONSE,
-                method: 'logoutResponseHandler',
-                event: 'logout'
-            }, {
-                op: _OPs2.default.CURRENT_AGENT_STATE_RESPONSE,
-                method: 'currentAgentStateResponseHandler',
-                event: 'get-current-agent-state'
-            }, {
-                op: _OPs2.default.QUERY_ACD_QUEUED_RESPONSE,
-                method: 'queryAcdStateResponseHandler',
-                event: 'query-acd-state-response-handler'
-            }, {
-                op: _OPs2.default.SET_CURRNET_AGENT_STATE_RESPONSE,
-                method: 'setCurrentAgentStateResponseHandler',
-                event: 'set-current-agent-state-eesponse'
-            }, {
-                op: _OPs2.default.MAKE_CALL_RESPONSE,
-                method: 'makeCallResponseHandler',
-                event: 'make-call-response'
-            }, {
-                op: _OPs2.default.DIAL_DTMF_RESPONSE,
-                method: 'dialDtmfResponseHandler',
-                event: 'dial-dtmf-response'
-            }, {
-                op: _OPs2.default.CALL_ACTION_RESPONSE,
-                method: 'callActionResponseHandler',
-                event: 'call-action-response'
-            }, {
-                op: _OPs2.default.GET_DN_STATE_RESPONSE,
-                method: 'getDnStateResponseHandler',
-                event: 'get-dn-state-response'
-            }, {
-                op: _OPs2.default.AGENT_STATE_CHANGE_EVENT, // 9001
-                method: 'agentStateChangeEventHandler',
-                event: 'agent-state-change-event'
-            }, {
-                op: _OPs2.default.MESSAGE_RECEIVE_EVENT, // 9002
-                method: 'messageReceiveEvent',
-                event: 'message-receive-event'
-            }, {
-                op: _OPs2.default.CALL_STATE_CHANGE_EVENT, // 9003
-                method: 'callStateChangeEvent',
-                event: 'state-change-event'
-            }, {
-                op: _OPs2.default.INCOMING_CALL_EVENT, // 9004
-                method: 'incomingCallEvent',
-                event: 'incoming-call-event'
-            }];
+            return _ResponseHandlerMap2.default;
         }
     }]);
 

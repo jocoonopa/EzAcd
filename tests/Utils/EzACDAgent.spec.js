@@ -31,6 +31,10 @@ describe('Agent 單元測試', function () {
         'mute',
         'cancel',
         'getDnState',
+        'getAgentGroupList',
+        'getAgentPerformance',
+        'getAgentGroupPerformance',
+        'getDnPerformance',
         'queryAcdQueued',
         'make2ndCall',
         'transfer',
@@ -38,7 +42,9 @@ describe('Agent 單元測試', function () {
         'disconnectMergeCall',
     ]
 
-    describe('Socket message send', () => {
+    let spyAgent = null
+
+    before(() => {
         mockServer.on('connection', socket => {
             socket.on('message', data => {
                 let obj = Adapter.toObj(data)
@@ -57,9 +63,17 @@ describe('Agent 單元測試', function () {
             ssl: config.ssl,
         }, null, false, socketStub)
 
+        spyAgent = sinon.spy(agent, 'dispatch')
+    })
+
+    describe('Socket message send', () => {
         publicMethods.forEach(publicMethod => {
-            it(`測試 ${publicMethod} 是否最後有把訊息發送到 socket 上`, (done) => {
+            it(`測試 ${publicMethod} 是否最後有把訊息發送到 socket 上`, done => {
                 agent[publicMethod]()
+
+                assert.equal(agent.dispatch.calledOnce, true)
+
+                agent.dispatch.resetHistory()
 
                 done()
             })

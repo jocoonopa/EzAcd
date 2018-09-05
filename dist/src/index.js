@@ -12,7 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 require('./bootstrap');
 
-var commands = ['call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'query:acd', 'restart'];
+var commands = ['acd:performance {$dn}', 'agent:performance', 'call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'query:acd', 'restart'];
 
 var agent = new _EzACDAgent2.default({
     port: config.port,
@@ -86,6 +86,10 @@ process.stdin.on('data', function (data) {
 
         case 'dn:state':
             agent.getDnState();
+            break;
+
+        case 'agent:performance':
+            agent.getAgentPerformance(null, 1);
             break;
 
         case 'query:acd':

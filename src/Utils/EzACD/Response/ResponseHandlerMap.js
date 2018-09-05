@@ -50,6 +50,12 @@ export default [
     },
 
     {
+        op: OPS.GET_AGENT_GROUP_LIST_RESPONSE,
+        method: 'getAgentGroupListResponse',
+        event: 'get-agent-group-list-response',
+    },
+
+    {
         op: OPS.CALL_ACTION_RESPONSE,
         method: 'callActionResponseHandler',
         event: 'call-action-response',
@@ -59,6 +65,24 @@ export default [
         op: OPS.GET_DN_STATE_RESPONSE,
         method: 'getDnStateResponseHandler',
         event: 'get-dn-state-response',
+    },
+
+    {
+        op: OPS.GET_DN_PERFORMANCE_RESPONSE, // 4050
+        method: 'getDnPerformanceResponse',
+        event: 'get-dn-performance-response',
+    },
+
+    {
+        op: OPS.GET_AGENT_PERFORMANCE_RESPONSE, // 4052
+        method: 'getAgentPerformanceResponse',
+        event: 'get-agent-performance-response',
+    },
+
+    {
+        op: OPS.GET_AGENT_GROUP_PERFORMANCE_RESPONSE, // 4051
+        method: 'getAgentGroupPerformanceResponse',
+        event: 'get-agent-group-performance-response',
     },
 
     {

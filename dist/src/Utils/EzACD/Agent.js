@@ -36,6 +36,10 @@ var _CallAction = require('./CallAction');
 
 var _CallAction2 = _interopRequireDefault(_CallAction);
 
+var _MergeCallAction = require('./MergeCallAction');
+
+var _MergeCallAction2 = _interopRequireDefault(_MergeCallAction);
+
 var _prettyjson = require('prettyjson');
 
 var _prettyjson2 = _interopRequireDefault(_prettyjson);
@@ -74,6 +78,7 @@ var Agent = function () {
     * @param  {Boolean} options.ssl      [ssl]
     * @param  {Object} bus              [Vue instance]
     * @param  {Boolean} isDebug         [是否啟用除錯]
+    * @param  {Object} mockConnection     [方便測試用，初始化時不建立 socket]
     * @return {Void}
     */
     function Agent(_ref) {
@@ -86,6 +91,7 @@ var Agent = function () {
             ssl = _ref.ssl;
         var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+        var mockConnection = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         _classCallCheck(this, Agent);
 
@@ -99,7 +105,7 @@ var Agent = function () {
         this.protocol = ssl ? 'wss' : 'ws';
         this.isDebug = isDebug;
 
-        this.initSocket();
+        this.initSocket(mockConnection);
 
         /* init by self */
         this.seq = 0;
@@ -112,6 +118,7 @@ var Agent = function () {
     /**
      * 建立 websocket
      *
+     * @param  {Object} mockConnection
      * @return {Void}
      */
 
@@ -119,39 +126,60 @@ var Agent = function () {
     _createClass(Agent, [{
         key: 'initSocket',
         value: function initSocket() {
+            var mockConnection = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            if (this.connection) {
+                return;
+            }
+
+            if (mockConnection) {
+                return this.initTestSocket(mockConnection);
+            }
+
             return 'undefined' !== typeof window ? this.initBrowserSocket() : this.initNodeSocket();
+        }
+    }, {
+        key: 'initTestSocket',
+        value: function initTestSocket(mockConnection) {
+            var _this = this;
+
+            this.connection = mockConnection;
+
+            this.connection.on('message', function (message) {
+                return _this.handler.receive(message);
+            });
         }
     }, {
         key: 'initBrowserSocket',
         value: function initBrowserSocket() {
-            var _this = this;
+            var _this2 = this;
 
             this.connection = new _websocket.w3cwebsocket(this.url, 'cti-agent-protocol');
 
             this.connection.onerror = function (error) {
-                _this.emit(Agent.events.SOCKET_ERROR, {
+                _this2.emit(Agent.events.SOCKET_ERROR, {
                     message: 'Connection Error: ' + error.toString()
                 });
             };
 
             this.connection.onopen = function () {
-                return _this.authorize();
+                return _this2.authorize();
             };
 
             this.connection.onclose = function () {
-                _this.emit(Agent.events.SOCKET_CLOSED, {
+                _this2.emit(Agent.events.SOCKET_CLOSED, {
                     message: 'echo-protocol Client Closed'
                 });
             };
 
             this.connection.onmessage = function (message) {
-                return _this.handler.receive(message);
+                return _this2.handler.receive(message);
             };
         }
     }, {
         key: 'initNodeSocket',
         value: function initNodeSocket() {
-            var _this2 = this;
+            var _this3 = this;
 
             this.socket = new _websocket.client();
 
@@ -162,33 +190,33 @@ var Agent = function () {
             this.socket.connect(this.url, 'cti-agent-protocol');
 
             this.socket.on('connect', function (connection) {
-                _this2.connection = connection;
+                _this3.connection = connection;
 
                 connection.on('message', function (message) {
-                    _this2.handler.receive(message);
+                    _this3.handler.receive(message);
                 });
 
                 connection.on('error', function (error) {
-                    if (_this2.isDebug) {
+                    if (_this3.isDebug) {
                         console.log(('Connection Error: ' + error.toString()).red);
                     }
 
-                    _this2.emit(Agent.events.SOCKET_ERROR, {
+                    _this3.emit(Agent.events.SOCKET_ERROR, {
                         message: 'Connection Error: ' + error.toString()
                     });
                 });
 
                 connection.on('close', function () {
-                    if (_this2.isDebug) {
+                    if (_this3.isDebug) {
                         console.log('echo-protocol Client Closed'.cyan);
                     }
 
-                    _this2.emit(Agent.events.SOCKET_CLOSED, {
+                    _this3.emit(Agent.events.SOCKET_CLOSED, {
                         message: 'echo-protocol Client Closed'
                     });
                 });
 
-                _this2.authorize();
+                _this3.authorize();
             });
         }
 
@@ -310,7 +338,7 @@ var Agent = function () {
 
         /**
          * Query ACD Queued
-         * 
+         *
          * @param  {Number} seq   [Unique command sequence]
          * @param  {Number} dn [ACD DN to be queried]
          * @return {Void}
@@ -412,6 +440,200 @@ var Agent = function () {
                 seq: seq,
                 act: act,
                 cid: this.cid // [cid 可以從 4030 (Make Call Response)取得]
+            });
+        }
+
+        /**
+         * This command is used when first call is connected
+         * and agent would like to make 2nd call for transfer,
+         * coach or conference etc.
+         *
+         * @param  {String}  tel  [dialed telephone number]
+         * @param  {String}  cid  [call id]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'make2ndCall',
+        value: function make2ndCall(tel, cid) {
+            return this.dispatch({
+                op: _OPs2.default.MAKE_2ND_CALL,
+                tel: tel,
+                cid: cid
+            });
+        }
+
+        /**
+         * Get Agent Group List (3021)
+         *
+         * This command is used to get real time agent state from ACD server.
+         * There are different type of information could be returned depending
+         * on request type.
+         *
+         * @param  {String} agroup
+         * @param  {Number} type
+         * @return {Void}
+         */
+
+    }, {
+        key: 'getAgentGroupList',
+        value: function getAgentGroupList(agroup, type) {
+            return this.dispatch({
+                op: _OPs2.default.GET_AGENT_GROUP_LIST,
+                agroup: agroup,
+                type: type
+            });
+        }
+
+        /**
+         * 轉接
+         *
+         * Disconnect agent's call leg and transfer it to 2nd call
+         *
+         * @param  {String} cid [call id]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'transfer',
+        value: function transfer(cid) {
+            return this.mergeCallAction(_MergeCallAction2.default.TRANSFER, cid);
+        }
+
+        /**
+         * Conference
+         *
+         * Make 1st and 2nd call into conference.
+         * This command is not available for lite ACD version.
+         *
+         * @param  {String} cid [call id]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'conference',
+        value: function conference(cid) {
+            return this.mergeCallAction(_MergeCallAction2.default.CONFERENCE, cid);
+        }
+
+        /**
+         * Disconnect 2nd call and back to talk to customer (1st call)
+         *
+         * @param  {String} cid [call id]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'disconnectMergeCall',
+        value: function disconnectMergeCall(cid) {
+            return this.mergeCallAction(_MergeCallAction2.default.DISCONNECT, cid);
+        }
+
+        /**
+         * This command is used to merge second call into first call.
+         * The action indicate the merge behavior to be done.
+         *
+         * @param  {Number} act [act code]
+         * @param  {String} cid [call id]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'mergeCallAction',
+        value: function mergeCallAction(act, cid) {
+            return this.dispatch({
+                op: _OPs2.default.MERGE_CALL_ACTION,
+                act: act,
+                cid: cid
+            });
+        }
+
+        /**
+         * Get DN Performance (3050)
+         *
+         * This command is used to query the the ACD-DN
+         * real time performance from server.
+         *
+         * only hourly performance (type=1) can have those real time information:
+         * f_queued, f_longest_waiting,f_alarm
+         *
+         * @param  {String} dn   [Queried ACD DN Number]
+         * @param  {Number} type [0:quarterly, 1:hourly, 2:daily]
+         * @param  {Number} fmt  [
+         *     0: (default, backward compatible full format)
+         *     1: wallboard format 1
+         *     2: wallboard format 2
+         * ]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'getDnPerformance',
+        value: function getDnPerformance(dn) {
+            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+            var fmt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+            return this.dispatch({
+                op: _OPs2.default.GET_DN_PERFORMANCE,
+                type: type,
+                fmt: fmt
+            });
+        }
+
+        /**
+         * Get Agent Group Performance(3051)
+         *
+         * This command is used to query the the Agent Group real time
+         * performance from server
+         *
+         * @param  {Number} agroup  [Agent Group ID to be Queried]
+         * @param  {Number} type [0:quarterly, 1:hourly, 2:daily]
+         * @param  {Number} fmt  [
+         *     0: (default, backward compatible full format)
+         *     1: wallboard format 1
+         *     2: wallboard format 2
+         * ]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'getAgentGroupPerformance',
+        value: function getAgentGroupPerformance(agroup) {
+            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+            var fmt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+            return this.dispatch({
+                op: _OPs2.default.GET_AGENT_GROUP_PERFORMANCE_RESPONSE,
+                agroup: agroup,
+                type: type,
+                fmt: fmt
+            });
+        }
+
+        /**
+         * Get Agent Performance (3052)
+         *
+         * This command is used to query the the Agent real time performance from server.
+         *
+         * @param  {String} ag   [
+         *   Optional, if supervisor would like to query
+         *   other agent's performance
+         * ]
+         * @param  {Number} type [0:quarterly, 1:hourly, 2:daily]
+         * @return {Void}
+         */
+
+    }, {
+        key: 'getAgentPerformance',
+        value: function getAgentPerformance() {
+            var ag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+            var type = arguments[1];
+
+            return this.dispatch({
+                op: _OPs2.default.GET_AGENT_PERFORMANCE,
+                seq: 1213333,
+                ag: ag,
+                type: type
             });
         }
 

@@ -67,6 +67,11 @@ export default [
     },
 
     {
+        code: OPs.GET_DN_PERFORMANCE,
+        desc: 'GET-DN-PERFORMANCE',
+    },
+
+    {
         code: OPs.MAKE_CALL_RESPONSE,
         desc: 'MAKE-CALL-RESPONSE',
     },
@@ -89,6 +94,36 @@ export default [
     {
         code: OPs.GET_DN_STATE_RESPONSE,
         desc: 'GET-DN-STATE-RESPONSE',
+    },
+
+    {
+        code: OPs.GET_DN_PERFORMANCE,
+        desc: 'GET-DN-PERFORMANCE',
+    },
+
+    {
+        code: OPs.GET_DN_PERFORMANCE_RESPONSE,
+        desc: 'GET-DN-PERFORMANCE-RESPONSE',
+    },
+
+    {
+        code: OPs.GET_AGENT_PERFORMANCE,
+        desc: 'GET-AGENT-PERFORMANCE',
+    },
+
+    {
+        code: OPs.GET_AGENT_PERFORMANCE_RESPONSE,
+        desc: 'GET-AGENT-PERFORMANCE-RESPONSE'
+    },
+
+    {
+        code: OPs.GET_AGENT_GROUP_PERFORMANCE,
+        desc: 'GET-AGENT-GROUP-PERFORMANCE',
+    },
+
+    {
+        code: OPs.GET_AGENT_GROUP_PERFORMANCE_RESPONSE,
+        desc: 'GET-AGENT-GROUP-PERFORMANCE-RESPONSE'
     },
 
     {
