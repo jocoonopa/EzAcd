@@ -460,7 +460,7 @@ export default class Agent
      */
     getAgentGroupPerformance(agroup, type = 1, fmt = 0) {
         return this.dispatch({
-            op: OPS.GET_AGENT_GROUP_PERFORMANCE_RESPONSE,
+            op: OPS.GET_AGENT_GROUP_PERFORMANCE,
             agroup,
             type,
             fmt,

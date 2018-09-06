@@ -603,7 +603,7 @@ var Agent = function () {
             var fmt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
             return this.dispatch({
-                op: _OPs2.default.GET_AGENT_GROUP_PERFORMANCE_RESPONSE,
+                op: _OPs2.default.GET_AGENT_GROUP_PERFORMANCE,
                 agroup: agroup,
                 type: type,
                 fmt: fmt
