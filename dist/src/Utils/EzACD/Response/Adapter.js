@@ -68,11 +68,22 @@ var Adapter = function () {
         value: function toObj(data) {
             var messages = data.split("\n");
             var obj = {};
-
-            _lodash2.default.each(messages, function (message) {
+            var filledObj = function filledObj(message) {
                 var pair = message.split('=');
 
-                obj[pair[0]] = pair[1];
+                return obj[pair[0]] = pair[1];
+            };
+
+            _lodash2.default.each(messages, function (message) {
+                if (_lodash2.default.includes(message, ',')) {
+                    var outPairs = message.split(',');
+
+                    return _lodash2.default.each(outPairs, function (message) {
+                        filledObj(message);
+                    });
+                }
+
+                filledObj(message);
             });
 
             return obj;

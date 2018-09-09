@@ -42,11 +42,22 @@ export default class Adapter
     static toObj(data) {
         let messages = data.split("\n")
         let obj = {}
-
-        _.each(messages, message => {
+        let filledObj = (message) => {
             let pair = message.split('=')
 
-            obj[pair[0]] = pair[1]
+            return obj[pair[0]] = pair[1]
+        }
+
+        _.each(messages, message => {
+            if (_.includes(message, ',')) {
+                let outPairs = message.split(',')
+
+                return _.each(outPairs, message => {
+                    filledObj(message)
+                })
+            }
+
+            filledObj(message)
         })
 
         return obj
