@@ -3,6 +3,7 @@ import OpDescList from '../OpDescList'
 import ResponseHandlerMap from './ResponseHandlerMap'
 import prettyjson from 'prettyjson'
 import colors from 'colors'
+import OPs from '../OPs'
 import _ from 'lodash'
 
 export default class Handler
@@ -29,6 +30,11 @@ export default class Handler
         let data = evt.data || evt.utf8Data
         let obj = Adapter.toObj(data)
         let op = Number(_.get(obj, 'op'))
+
+        if (_.isEqual(op, OPs.GET_AGENT_GROUP_LIST_RESPONSE)) {
+            obj = Adapter.toObj(data, true)
+        }
+
         let opDesc = _.find(OpDescList, { code: op })
 
         this.cb = _.find(this.cbs, {
@@ -230,14 +236,14 @@ export default class Handler
     }
 
     /**
-     * getAgentGroupListResponse
+     * getAgentGroupListResponse (4021)
      *
      * @param  {String}  data
      * @param  {Boolean} isError
      * @return {Mixed}
      */
     getAgentGroupListResponse(data, isError) {
-        return this.emitViaBus(Adapter.toObj(data), isError)
+        return this.emitViaBus(Adapter.toObj(data, true), isError)
     }
 
     /**

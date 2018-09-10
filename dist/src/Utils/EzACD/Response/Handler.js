@@ -26,6 +26,10 @@ var _colors = require('colors');
 
 var _colors2 = _interopRequireDefault(_colors);
 
+var _OPs = require('../OPs');
+
+var _OPs2 = _interopRequireDefault(_OPs);
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -65,6 +69,11 @@ var Handler = function () {
             var data = evt.data || evt.utf8Data;
             var obj = _Adapter2.default.toObj(data);
             var op = Number(_lodash2.default.get(obj, 'op'));
+
+            if (_lodash2.default.isEqual(op, _OPs2.default.GET_AGENT_GROUP_LIST_RESPONSE)) {
+                obj = _Adapter2.default.toObj(data, true);
+            }
+
             var opDesc = _lodash2.default.find(_OpDescList2.default, { code: op });
 
             this.cb = _lodash2.default.find(this.cbs, {
@@ -301,7 +310,7 @@ var Handler = function () {
         }
 
         /**
-         * getAgentGroupListResponse
+         * getAgentGroupListResponse (4021)
          *
          * @param  {String}  data
          * @param  {Boolean} isError
@@ -311,7 +320,7 @@ var Handler = function () {
     }, {
         key: 'getAgentGroupListResponse',
         value: function getAgentGroupListResponse(data, isError) {
-            return this.emitViaBus(_Adapter2.default.toObj(data), isError);
+            return this.emitViaBus(_Adapter2.default.toObj(data, true), isError);
         }
 
         /**

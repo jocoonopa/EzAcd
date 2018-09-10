@@ -10,6 +10,10 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _OPs = require('../OPs');
+
+var _OPs2 = _interopRequireDefault(_OPs);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -24,7 +28,7 @@ var Adapter = function () {
 
         /**
          * 從傳入的 response data 取得指定欄位的值
-         * 
+         *
          * @param  {String}  data
          * @param  {String} key
          * @return {String|Null}
@@ -60,22 +64,25 @@ var Adapter = function () {
          * 將傳入的 response data 轉換為 Object
          *
          * @param  {String} data
+         * @param  {Boolean} isIgnoreComma
          * @return {Object}
          */
 
     }, {
         key: 'toObj',
         value: function toObj(data) {
+            var isIgnoreComma = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
             var messages = data.split("\n");
             var obj = {};
             var filledObj = function filledObj(message) {
                 var pair = message.split('=');
 
-                return obj[pair[0]] = _lodash2.default.gt(pair.length, 2) ? _lodash2.default.slice(pair, 1) : pair[1];
+                return obj[pair[0]] = _lodash2.default.gt(pair.length, 2) ? Adapter.agentListStringHandle(_lodash2.default.slice(pair, 1).join('=')) : pair[1];
             };
 
             _lodash2.default.each(messages, function (message) {
-                if (_lodash2.default.includes(message, ',')) {
+                if (!isIgnoreComma && _lodash2.default.includes(message, ',')) {
                     var outPairs = message.split(',');
 
                     return _lodash2.default.each(outPairs, function (message) {
@@ -87,6 +94,31 @@ var Adapter = function () {
             });
 
             return obj;
+        }
+
+        /**
+         * 不得已的特例處理, 因為格式就是非常特別
+         *
+         * @param  {String} str
+         * @return {Array}
+         */
+
+    }, {
+        key: 'agentListStringHandle',
+        value: function agentListStringHandle(str) {
+            var arr = [];
+            var agentStrs = str.split(',');
+
+            _lodash2.default.each(agentStrs, function (agentStr) {
+                var obj = {};
+                var agentPair = agentStr.split('=');
+
+                obj[agentPair[0].split(' ')[1]] = agentPair[1];
+
+                arr.push(obj);
+            });
+
+            return arr;
         }
     }]);
 
