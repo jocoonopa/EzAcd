@@ -6,6 +6,8 @@ import prettyjson from 'prettyjson'
 const commands = [
     'acd:performance {$dn}',
     'agent:performance',
+    'agent:group:performance {$agroup} {$type} {$fmt}',
+    'agent:group:list {$agroup} {$type}',
     'call:answer',
     'call:hold',
     'call:disconnect',
@@ -97,6 +99,14 @@ process.stdin.on('data', data => {
 
         case 'agent:performance':
             agent.getAgentPerformance(null, 1)
+        break
+
+        case 'agent:group:performance':
+            agent.getAgentGroupPerformance(_.get(argvs, 1), _.get(argvs, 2), _.get(argvs, 3))
+        break
+
+        case 'agent:group:list':
+            agent.getAgentGroupList(_.get(argvs, 1), _.get(argvs, 2))
         break
 
         case 'query:acd':

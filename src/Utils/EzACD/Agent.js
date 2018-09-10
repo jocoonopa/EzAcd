@@ -355,7 +355,7 @@ export default class Agent
      * on request type.
      *
      * @param  {String} agroup
-     * @param  {Number} type
+     * @param  {Number} type [0 ~ 6 p23]
      * @return {Void}
      */
     getAgentGroupList(agroup, type) {

@@ -12,7 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 require('./bootstrap');
 
-var commands = ['acd:performance {$dn}', 'agent:performance', 'call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'query:acd', 'restart'];
+var commands = ['acd:performance {$dn}', 'agent:performance', 'agent:group:performance {$agroup} {$type} {$fmt}', 'agent:group:list {$agroup} {$type}', 'call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'query:acd', 'restart'];
 
 var agent = new _EzACDAgent2.default({
     port: config.port,
@@ -90,6 +90,14 @@ process.stdin.on('data', function (data) {
 
         case 'agent:performance':
             agent.getAgentPerformance(null, 1);
+            break;
+
+        case 'agent:group:performance':
+            agent.getAgentGroupPerformance(_.get(argvs, 1), _.get(argvs, 2), _.get(argvs, 3));
+            break;
+
+        case 'agent:group:list':
+            agent.getAgentGroupList(_.get(argvs, 1), _.get(argvs, 2));
             break;
 
         case 'query:acd':

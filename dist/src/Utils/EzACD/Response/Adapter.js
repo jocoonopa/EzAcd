@@ -71,7 +71,7 @@ var Adapter = function () {
             var filledObj = function filledObj(message) {
                 var pair = message.split('=');
 
-                return obj[pair[0]] = pair[1];
+                return obj[pair[0]] = _lodash2.default.gt(pair.length, 2) ? _lodash2.default.slice(pair, 1) : pair[1];
             };
 
             _lodash2.default.each(messages, function (message) {

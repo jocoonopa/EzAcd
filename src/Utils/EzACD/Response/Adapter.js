@@ -45,7 +45,7 @@ export default class Adapter
         let filledObj = (message) => {
             let pair = message.split('=')
 
-            return obj[pair[0]] = pair[1]
+            return obj[pair[0]] = _.gt(pair.length, 2) ? _.slice(pair, 1) : pair[1]
         }
 
         _.each(messages, message => {
