@@ -1,6 +1,7 @@
 {
     "domain": "{$DOMAIN}",
     "port": "{$PORT}",
+    "sub_protocol": "{$SUB_PROTOCOL}",
     "password": "{$PASSWORD}",
     "id": "{$AGENT_ID}",
     "ext": "{$EXT}",

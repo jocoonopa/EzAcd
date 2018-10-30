@@ -1,6 +1,7 @@
 {
     "domain": "ezdemo.ezvoicetek.com",
     "port": 2085,
+    "sub_protocol": "cti-agent-protocol",
     "password": "ag8260",
     "id": "ag8260",
     "ext": 8260,

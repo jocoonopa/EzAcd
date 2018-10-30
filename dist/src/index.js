@@ -21,6 +21,7 @@ var agent = new _EzACDAgent2.default({
     ext: config.ext,
     password: config.password,
     centerId: config.center_id,
+    subProtocol: config.sub_protocol,
     ssl: config.ssl
 }, null, config.isDebug);
 

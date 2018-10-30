@@ -75,6 +75,7 @@ var Agent = function () {
     * @param  {Number} options.ext      [分機]
     * @param  {String} options.password [密碼]
     * @param  {String} options.centerId [Center Id]
+    * @param  {String} options.subProtocol [websocket subProtocol]
     * @param  {Boolean} options.ssl      [ssl]
     * @param  {Object} bus              [Vue instance]
     * @param  {Boolean} isDebug         [是否啟用除錯]
@@ -88,7 +89,8 @@ var Agent = function () {
             ext = _ref.ext,
             password = _ref.password,
             centerId = _ref.centerId,
-            ssl = _ref.ssl;
+            ssl = _ref.ssl,
+            subProtocol = _ref.subProtocol;
         var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         var mockConnection = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -104,6 +106,7 @@ var Agent = function () {
         this.cid = null;
         this.protocol = ssl ? 'wss' : 'ws';
         this.isDebug = isDebug;
+        this.subProtocol = subProtocol;
 
         this.initSocket(mockConnection);
 
@@ -154,7 +157,7 @@ var Agent = function () {
         value: function initBrowserSocket() {
             var _this2 = this;
 
-            this.connection = new _websocket.w3cwebsocket(this.url, 'cti-agent-protocol');
+            this.connection = new _websocket.w3cwebsocket(this.url, this.subProtocol);
 
             this.connection.onerror = function (error) {
                 _this2.emit(Agent.events.SOCKET_ERROR, {
@@ -187,7 +190,7 @@ var Agent = function () {
                 console.log(('\n' + this.url + '\n\n').yellow);
             }
 
-            this.socket.connect(this.url, 'cti-agent-protocol');
+            this.socket.connect(this.url, this.subProtocol);
 
             this.socket.on('connect', function (connection) {
                 _this3.connection = connection;

@@ -31,13 +31,14 @@ export default class Agent
     * @param  {Number} options.ext      [分機]
     * @param  {String} options.password [密碼]
     * @param  {String} options.centerId [Center Id]
+    * @param  {String} options.subProtocol [websocket subProtocol]
     * @param  {Boolean} options.ssl      [ssl]
     * @param  {Object} bus              [Vue instance]
     * @param  {Boolean} isDebug         [是否啟用除錯]
     * @param  {Object} mockConnection     [方便測試用，初始化時不建立 socket]
     * @return {Void}
     */
-    constructor({ port, domain, id, ext, password, centerId, ssl }, bus = null, isDebug = false, mockConnection = null) {
+    constructor({ port, domain, id, ext, password, centerId, ssl, subProtocol }, bus = null, isDebug = false, mockConnection = null) {
         this.port = port
         this.domain = domain
         this.id = id
@@ -47,6 +48,7 @@ export default class Agent
         this.cid = null
         this.protocol = ssl ? 'wss' : 'ws'
         this.isDebug = isDebug
+        this.subProtocol = subProtocol
 
         this.initSocket(mockConnection)
 
@@ -83,7 +85,7 @@ export default class Agent
     }
 
     initBrowserSocket() {
-        this.connection = new w3cwebsocket(this.url, 'cti-agent-protocol')
+        this.connection = new w3cwebsocket(this.url, this.subProtocol)
 
         this.connection.onerror = error => {
             this.emit(Agent.events.SOCKET_ERROR, {
@@ -109,7 +111,7 @@ export default class Agent
             console.log(`\n${this.url}\n\n`.yellow)
         }
 
-        this.socket.connect(this.url, 'cti-agent-protocol')
+        this.socket.connect(this.url, this.subProtocol)
 
         this.socket.on('connect', connection => {
             this.connection = connection
