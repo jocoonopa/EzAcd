@@ -54,6 +54,26 @@ exports.default = [{
     op: _OPs2.default.GET_DN_STATE_RESPONSE,
     method: 'getDnStateResponseHandler',
     event: 'get-dn-state-response'
+}, { // 4040
+    op: _OPs2.default.SUPERVISOR_COACH_RESPONSE,
+    method: 'unknownHandler',
+    event: 'supervisor-coach-response'
+}, { // 4041
+    op: _OPs2.default.SUPERVISOR_MONITOR_RESPONSE,
+    method: 'unknownHandler',
+    event: 'supervisor-monitor-response'
+}, { // 4042
+    op: _OPs2.default.SUPERVISOR_CONFERENCE_RESPONSE,
+    method: 'unknownHandler',
+    event: 'supervisor-conference-response'
+}, { // 4043
+    op: _OPs2.default.SUPERVISOR_TRANSFER_RESPONSE,
+    method: 'unknownHandler',
+    event: 'supervisor-transfer-response'
+}, { // 4044
+    op: _OPs2.default.SUPERVISOR_TALK_TO_AGENT_RESPONSE,
+    method: 'unknownHandler',
+    event: 'supervisor-talk-to-agent-response'
 }, {
     op: _OPs2.default.GET_DN_PERFORMANCE_RESPONSE, // 4050
     method: 'getDnPerformanceResponse',

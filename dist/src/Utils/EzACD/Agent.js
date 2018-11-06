@@ -584,6 +584,112 @@ var Agent = function () {
         }
 
         /**
+         * Supervisor Coach (3040)
+         *
+         * This command is for supervisor only.
+         * It will start the coach with the selected agent.
+         * This command is normally used after [Supervisor Monitor Request].
+         *
+         * @param  {String} agext
+         * @return {Void}
+         */
+
+    }, {
+        key: 'supservisorCoach',
+        value: function supservisorCoach(agext) {
+            return this.dispatch({
+                op: _OPs2.default.SUPERVISOR_COACH,
+                agext: agext
+            });
+        }
+
+        /**
+         * Supervisor Monitor (3041)
+         *
+         * This command is for supervisor only.
+         * It will start the monitor to the selected agent.
+         *
+         * @param  {String} agext
+         * @return {Void}
+         */
+
+    }, {
+        key: 'supservisorMonitor',
+        value: function supservisorMonitor(agext) {
+            return this.dispatch({
+                op: _OPs2.default.SUPERVISOR_MONITOR,
+                agext: agext
+            });
+        }
+
+        /**
+         * Supervisor Conference (3042)
+         *
+         * This command is for supervisor only.
+         * It will start the conference with the selected agent and customer.
+         * This command is normally used after [Supervisor Monitor Request]
+         * or [Supervisor Coach Request].
+         *
+         * @param  {String} agext
+         * @return {Void}
+         */
+
+    }, {
+        key: 'supervisorConference',
+        value: function supervisorConference(agext) {
+            return this.dispatch({
+                op: _OPs2.default.SUPERVISOR_CONFERENCE,
+                agext: agext
+            });
+        }
+
+        /**
+         * Supervisor Transfer (3043)
+         *
+         * This command is for supervisor only.
+         * It will start the conference with the selected agent and customer.
+         * This command is normally used after Supervisor Monitor Request,
+         * Supervisor Coach Request or Supervisor Conference Request.
+         *
+         * After his command, the selected agent will be disconnect from the call
+         * and the customer will talk to customer directly.
+         *
+         * @param  {String} agext
+         * @return {Void}
+         */
+
+    }, {
+        key: 'supervisorTransfer',
+        value: function supervisorTransfer(agext) {
+            return this.dispatch({
+                op: _OPs2.default.SUPERVISOR_TRANSFER,
+                agext: agext
+            });
+        }
+
+        /**
+         * Supervisor Talk to Agent (3044)
+         *
+         * This command is for supervisor only and it is normally used after
+         * [Supervisor Monitor Request] or [Supervisor Coach Request].
+         *
+         * After this command, the customer will be hold (hearing music)
+         * and agent will able to talk to supervisor privately.
+         *
+         * @param  {String} agext
+         * @return {Void}
+         */
+
+    }, {
+        key: 'supervisorTalkToAgent',
+        value: function supervisorTalkToAgent(agext) {
+            return this.dispatch({
+                op: _OPs2.default.SUPERVISOR_TALK_TO_AGENT,
+                agext: agext
+            });
+        }
+
+        /**
          * Get Agent Group Performance(3051)
          *
          * This command is used to query the the Agent Group real time

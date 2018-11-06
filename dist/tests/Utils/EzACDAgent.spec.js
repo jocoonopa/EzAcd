@@ -36,7 +36,7 @@ describe('Agent 單元測試', function () {
     socketStub.connect = function () {};
 
     var agent = null;
-    var publicMethods = ['login', 'logout', 'getState', 'setState', 'makeCall', 'dialDtmf', 'hold', 'answer', 'disconnect', 'mute', 'cancel', 'getDnState', 'getAgentGroupList', 'getAgentPerformance', 'getAgentGroupPerformance', 'getDnPerformance', 'queryAcdQueued', 'make2ndCall', 'transfer', 'conference', 'disconnectMergeCall'];
+    var publicMethods = ['login', 'logout', 'getState', 'setState', 'makeCall', 'dialDtmf', 'hold', 'answer', 'disconnect', 'mute', 'cancel', 'getDnState', 'getAgentGroupList', 'getAgentPerformance', 'getAgentGroupPerformance', 'getDnPerformance', 'queryAcdQueued', 'make2ndCall', 'transfer', 'conference', 'disconnectMergeCall', 'supservisorCoach', 'supservisorMonitor', 'supervisorConference', 'supervisorTransfer', 'supervisorTalkToAgent'];
 
     var spyAgent = null;
 

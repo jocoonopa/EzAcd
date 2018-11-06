@@ -67,6 +67,36 @@ export default [
         event: 'get-dn-state-response',
     },
 
+    {// 4040
+        op: OPS.SUPERVISOR_COACH_RESPONSE,
+        method: 'unknownHandler',
+        event: 'supervisor-coach-response',
+    },
+
+    {// 4041
+        op: OPS.SUPERVISOR_MONITOR_RESPONSE,
+        method: 'unknownHandler',
+        event: 'supervisor-monitor-response',
+    },
+
+    {// 4042
+        op: OPS.SUPERVISOR_CONFERENCE_RESPONSE,
+        method: 'unknownHandler',
+        event: 'supervisor-conference-response',
+    },
+
+    {// 4043
+        op: OPS.SUPERVISOR_TRANSFER_RESPONSE,
+        method: 'unknownHandler',
+        event: 'supervisor-transfer-response',
+    },
+
+    {// 4044
+        op: OPS.SUPERVISOR_TALK_TO_AGENT_RESPONSE,
+        method: 'unknownHandler',
+        event: 'supervisor-talk-to-agent-response',
+    },
+
     {
         op: OPS.GET_DN_PERFORMANCE_RESPONSE, // 4050
         method: 'getDnPerformanceResponse',

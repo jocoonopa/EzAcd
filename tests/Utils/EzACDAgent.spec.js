@@ -40,6 +40,11 @@ describe('Agent 單元測試', function () {
         'transfer',
         'conference',
         'disconnectMergeCall',
+        'supservisorCoach',
+        'supservisorMonitor',
+        'supervisorConference',
+        'supervisorTransfer',
+        'supervisorTalkToAgent',
     ]
 
     let spyAgent = null
