@@ -175,4 +175,54 @@ export default [
         code: OPs.MERGE_CALL_ACTION_RESPONSE,
         desc: 'MERGE-CALL-ACTION-RESPONSE',
     },
+
+    {
+        code: OPs.SUPERVISOR_COACH,
+        desc: 'SUPERVISOR-COACH',
+    },
+
+    {
+        code: OPs.SUPERVISOR_MONITOR,
+        desc: 'SUPERVISOR-MONITOR',
+    },
+
+    {
+        code: OPs.SUPERVISOR_CONFERENCE,
+        desc: 'SUPERVISOR-CONFERENCE',
+    },
+
+    {
+        code: OPs.SUPERVISOR_TRANSFER,
+        desc: 'SUPERVISOR-TRANSFER',
+    },
+
+    {
+        code: OPs.SUPERVISOR_TALK_TO_AGENT,
+        desc: 'SUPERVISOR-TALK-TO-AGENT',
+    },
+
+    {
+        code: OPs.SUPERVISOR_COACH_RESPONSE,
+        desc: 'SUPERVISOR-COACH-RESPONSE',
+    },
+
+    {
+        code: OPs.SUPERVISOR_MONITOR_RESPONSE,
+        desc: 'SUPERVISOR-MONITOR-RESPONSE',
+    },
+
+    {
+        code: OPs.SUPERVISOR_CONFERENCE_RESPONSE,
+        desc: 'SUPERVISOR-CONFERENCE-RESPONSE',
+    },
+
+    {
+        code: OPs.SUPERVISOR_TRANSFER_RESPONSE,
+        desc: 'SUPERVISOR-TRANSFER-RESPONSE',
+    },
+
+    {
+        code: OPs.SUPERVISOR_TALK_TO_AGENT_RESPONSE,
+        desc: 'SUPERVISOR-TALK-TO-AGENT-RESPONSE',
+    },
 ]

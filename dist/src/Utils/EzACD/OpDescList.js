@@ -115,4 +115,34 @@ exports.default = [{
 }, {
     code: _OPs2.default.MERGE_CALL_ACTION_RESPONSE,
     desc: 'MERGE-CALL-ACTION-RESPONSE'
+}, {
+    code: _OPs2.default.SUPERVISOR_COACH,
+    desc: 'SUPERVISOR-COACH'
+}, {
+    code: _OPs2.default.SUPERVISOR_MONITOR,
+    desc: 'SUPERVISOR-MONITOR'
+}, {
+    code: _OPs2.default.SUPERVISOR_CONFERENCE,
+    desc: 'SUPERVISOR-CONFERENCE'
+}, {
+    code: _OPs2.default.SUPERVISOR_TRANSFER,
+    desc: 'SUPERVISOR-TRANSFER'
+}, {
+    code: _OPs2.default.SUPERVISOR_TALK_TO_AGENT,
+    desc: 'SUPERVISOR-TALK-TO-AGENT'
+}, {
+    code: _OPs2.default.SUPERVISOR_COACH_RESPONSE,
+    desc: 'SUPERVISOR-COACH-RESPONSE'
+}, {
+    code: _OPs2.default.SUPERVISOR_MONITOR_RESPONSE,
+    desc: 'SUPERVISOR-MONITOR-RESPONSE'
+}, {
+    code: _OPs2.default.SUPERVISOR_CONFERENCE_RESPONSE,
+    desc: 'SUPERVISOR-CONFERENCE-RESPONSE'
+}, {
+    code: _OPs2.default.SUPERVISOR_TRANSFER_RESPONSE,
+    desc: 'SUPERVISOR-TRANSFER-RESPONSE'
+}, {
+    code: _OPs2.default.SUPERVISOR_TALK_TO_AGENT_RESPONSE,
+    desc: 'SUPERVISOR-TALK-TO-AGENT-RESPONSE'
 }];
