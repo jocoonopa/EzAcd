@@ -595,8 +595,8 @@ var Agent = function () {
          */
 
     }, {
-        key: 'supservisorCoach',
-        value: function supservisorCoach(agext) {
+        key: 'supervisorCoach',
+        value: function supervisorCoach(agext) {
             return this.dispatch({
                 op: _OPs2.default.SUPERVISOR_COACH,
                 agext: agext
@@ -614,8 +614,8 @@ var Agent = function () {
          */
 
     }, {
-        key: 'supservisorMonitor',
-        value: function supservisorMonitor(agext) {
+        key: 'supervisorMonitor',
+        value: function supervisorMonitor(agext) {
             return this.dispatch({
                 op: _OPs2.default.SUPERVISOR_MONITOR,
                 agext: agext

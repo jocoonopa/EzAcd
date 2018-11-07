@@ -455,7 +455,7 @@ export default class Agent
      * @param  {String} agext
      * @return {Void}
      */
-    supservisorCoach(agext) {
+    supervisorCoach(agext) {
         return this.dispatch({
             op: OPS.SUPERVISOR_COACH,
             agext,
@@ -471,7 +471,7 @@ export default class Agent
      * @param  {String} agext
      * @return {Void}
      */
-    supservisorMonitor(agext) {
+    supervisorMonitor(agext) {
         return this.dispatch({
             op: OPS.SUPERVISOR_MONITOR,
             agext,
