@@ -34,7 +34,7 @@ export default [
     {
         op: OPS.SET_CURRNET_AGENT_STATE_RESPONSE,
         method: 'setCurrentAgentStateResponseHandler',
-        event: 'set-current-agent-state-eesponse',
+        event: 'set-current-agent-state-response',
     },
 
     {
