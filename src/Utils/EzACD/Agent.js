@@ -56,6 +56,7 @@ export default class Agent
         this.seq = 0
         this.state = null
         this.callState = null
+        this.hasClosed = false
 
         this.handler = new ResponseHandler(this, bus, isDebug)
     }
@@ -96,6 +97,8 @@ export default class Agent
         this.connection.onopen = () => this.authorize()
 
         this.connection.onclose = () => {
+            this.hasClosed = true
+
             this.emit(Agent.events.SOCKET_CLOSED, {
                 message: 'echo-protocol Client Closed',
             })
@@ -131,6 +134,8 @@ export default class Agent
             })
 
             connection.on('close', () => {
+                this.hasClosed = true
+
                 if (this.isDebug) {
                     console.log(`echo-protocol Client Closed`.cyan)
                 }
@@ -339,13 +344,16 @@ export default class Agent
      *
      * @param  {String}  tel  [dialed telephone number]
      * @param  {String}  cid  [call id]
+     * @param  {String}  cdata  [CTI data for this call, this CTI data will overwrite the
+existing one)]
      * @return {Void}
      */
-    make2ndCall(tel, cid) {
+    make2ndCall(tel, cid, cdata) {
         return this.dispatch({
             op: OPS.MAKE_2ND_CALL,
             tel,
             cid,
+            cdata,
         })
     }
 
@@ -411,7 +419,7 @@ export default class Agent
      * @param  {String} cid [call id]
      * @return {Void}
      */
-    mergeCallAction(act, cid) {
+    mergeCallAction(act, cid, cdata) {
         return this.dispatch({
             op: OPS.MERGE_CALL_ACTION,
             act,
@@ -610,7 +618,7 @@ export default class Agent
             console.log(prettyjson.render(obj))
         }
 
-        return this.connection.send(Agent.genSendStr(obj))
+        return this.hasClosed ? null : this.connection.send(Agent.genSendStr(obj))
     }
 
     emit(eventName, withData) {

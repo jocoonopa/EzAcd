@@ -33,7 +33,7 @@ exports.default = [{
 }, {
     op: _OPs2.default.SET_CURRNET_AGENT_STATE_RESPONSE,
     method: 'setCurrentAgentStateResponseHandler',
-    event: 'set-current-agent-state-eesponse'
+    event: 'set-current-agent-state-response'
 }, {
     op: _OPs2.default.MAKE_CALL_RESPONSE,
     method: 'makeCallResponseHandler',

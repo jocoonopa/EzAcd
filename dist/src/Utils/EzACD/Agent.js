@@ -114,6 +114,7 @@ var Agent = function () {
         this.seq = 0;
         this.state = null;
         this.callState = null;
+        this.hasClosed = false;
 
         this.handler = new _Handler2.default(this, bus, isDebug);
     }
@@ -170,6 +171,8 @@ var Agent = function () {
             };
 
             this.connection.onclose = function () {
+                _this2.hasClosed = true;
+
                 _this2.emit(Agent.events.SOCKET_CLOSED, {
                     message: 'echo-protocol Client Closed'
                 });
@@ -210,6 +213,8 @@ var Agent = function () {
                 });
 
                 connection.on('close', function () {
+                    _this3.hasClosed = true;
+
                     if (_this3.isDebug) {
                         console.log('echo-protocol Client Closed'.cyan);
                     }
@@ -453,16 +458,19 @@ var Agent = function () {
          *
          * @param  {String}  tel  [dialed telephone number]
          * @param  {String}  cid  [call id]
+         * @param  {String}  cdata  [CTI data for this call, this CTI data will overwrite the
+        existing one)]
          * @return {Void}
          */
 
     }, {
         key: 'make2ndCall',
-        value: function make2ndCall(tel, cid) {
+        value: function make2ndCall(tel, cid, cdata) {
             return this.dispatch({
                 op: _OPs2.default.MAKE_2ND_CALL,
                 tel: tel,
-                cid: cid
+                cid: cid,
+                cdata: cdata
             });
         }
 
@@ -543,7 +551,7 @@ var Agent = function () {
 
     }, {
         key: 'mergeCallAction',
-        value: function mergeCallAction(act, cid) {
+        value: function mergeCallAction(act, cid, cdata) {
             return this.dispatch({
                 op: _OPs2.default.MERGE_CALL_ACTION,
                 act: act,
@@ -776,7 +784,7 @@ var Agent = function () {
                 console.log(_prettyjson2.default.render(obj));
             }
 
-            return this.connection.send(Agent.genSendStr(obj));
+            return this.hasClosed ? null : this.connection.send(Agent.genSendStr(obj));
         }
     }, {
         key: 'emit',
