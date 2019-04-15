@@ -93,6 +93,53 @@ var Adapter = function () {
                 filledObj(message);
             });
 
+            if (!_lodash2.default.isEqual(-1, data.indexOf('dnlist'))) {
+                return Adapter.dnListColumnHandle(obj, data);
+            }
+
+            return obj;
+        }
+
+        /**
+         * 特別處理 dnlist
+         *
+         * @param  {Object} obj 回傳物件
+         * @param  {Object} data 取得的 ezvoice data
+         * @return {Object}
+         */
+
+    }, {
+        key: 'dnListColumnHandle',
+        value: function dnListColumnHandle(obj, data) {
+            obj['dnlist'] = [];
+
+            var dnList = data.substr(data.indexOf('dnlist') + 'dnlist='.length).replace("\n", '');
+            // 540939229901=Default Testing DN;0;0;100,540939229902=2nd Dev DN;0;0;100,540939229903=3rd Dev DN;0;0;100,
+
+            var dnListArray = dnList.split(',');
+
+            _lodash2.default.forEach(dnListArray, function (dn) {
+                if (_lodash2.default.isEmpty(dn)) {
+                    return;
+                }
+
+                var splitMix = dn.split('=');
+
+                if (_lodash2.default.isNil(splitMix)) {
+                    return;
+                }
+
+                var tailMix = splitMix[1].split(';');
+
+                obj['dnlist'].push({
+                    dn: splitMix[0],
+                    dnname: tailMix[0],
+                    queued_calls: tailMix[1],
+                    queued_time: tailMix[2],
+                    queued_max: tailMix[3]
+                });
+            });
+
             return obj;
         }
 

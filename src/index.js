@@ -17,7 +17,7 @@ const commands = [
     'dn:state',
     'get {$key}',
     'get:state',
-    'login', 
+    'login',
     'logout',
     'make:call {$dn}',
     'set:state {$state}',
@@ -129,4 +129,3 @@ process.stdin.on('data', data => {
 })
 
 
- 

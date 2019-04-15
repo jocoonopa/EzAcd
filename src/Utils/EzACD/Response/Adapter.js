@@ -62,6 +62,50 @@ export default class Adapter
             filledObj(message)
         })
 
+        if (! _.isEqual(-1, data.indexOf('dnlist'))) {
+            return Adapter.dnListColumnHandle(obj, data)
+        }
+
+        return obj
+    }
+
+    /**
+     * 特別處理 dnlist
+     *
+     * @param  {Object} obj 回傳物件
+     * @param  {Object} data 取得的 ezvoice data
+     * @return {Object}
+     */
+    static dnListColumnHandle(obj, data) {
+        obj['dnlist'] = []
+
+        let dnList = data.substr(data.indexOf('dnlist') + 'dnlist='.length).replace("\n", '');
+        // 540939229901=Default Testing DN;0;0;100,540939229902=2nd Dev DN;0;0;100,540939229903=3rd Dev DN;0;0;100,
+
+        let dnListArray = dnList.split(',')
+
+        _.forEach(dnListArray, dn => {
+            if (_.isEmpty(dn)) {
+                return
+            }
+
+            let splitMix = dn.split('=')
+
+            if (_.isNil(splitMix)) {
+                return
+            }
+
+            let tailMix = splitMix[1].split(';')
+
+            obj['dnlist'].push({
+                dn: splitMix[0],
+                dnname: tailMix[0],
+                queued_calls: tailMix[1],
+                queued_time: tailMix[2],
+                queued_max: tailMix[3],
+            })
+        })
+
         return obj
     }
 
