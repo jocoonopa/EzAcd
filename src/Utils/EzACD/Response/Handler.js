@@ -451,7 +451,11 @@ export default class Handler
      * @return {Mixed}
      */
     incomingCallEvent(data) {
-        return this.emitViaBus(Adapter.toObj(data))
+        let obj = Adapter.toObj(data)
+
+        this.agent.cid = obj.cid
+
+        return this.emitViaBus(obj)
     }
 
     /**

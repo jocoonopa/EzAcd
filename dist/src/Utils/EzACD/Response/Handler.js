@@ -546,7 +546,11 @@ var Handler = function () {
     }, {
         key: 'incomingCallEvent',
         value: function incomingCallEvent(data) {
-            return this.emitViaBus(_Adapter2.default.toObj(data));
+            var obj = _Adapter2.default.toObj(data);
+
+            this.agent.cid = obj.cid;
+
+            return this.emitViaBus(obj);
         }
 
         /**
