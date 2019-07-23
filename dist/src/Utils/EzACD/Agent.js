@@ -115,6 +115,7 @@ var Agent = function () {
         this.state = null;
         this.callState = null;
         this.hasClosed = false;
+        this.bus = bus;
 
         this.handler = new _Handler2.default(this, bus, isDebug);
     }

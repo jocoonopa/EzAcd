@@ -57,6 +57,7 @@ export default class Agent
         this.state = null
         this.callState = null
         this.hasClosed = false
+        this.bus = bus
 
         this.handler = new ResponseHandler(this, bus, isDebug)
     }
