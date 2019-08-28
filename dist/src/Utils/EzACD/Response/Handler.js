@@ -74,13 +74,13 @@ var Handler = function () {
                 obj = _Adapter2.default.toObj(data, true);
             }
 
-            var opDesc = _lodash2.default.find(_OpDescList2.default, { code: op });
-
             this.cb = _lodash2.default.find(this.cbs, {
                 op: op
             });
 
             if (this.isDebug) {
+                var opDesc = _lodash2.default.find(_OpDescList2.default, { code: op });
+
                 opDesc ? console.log(('\n<<<<<<<<<<<<<< ' + opDesc.desc).cyan) : console.log(('\n<<<<<<<<<<<<<< Unknown (' + op + ')').cyan);
 
                 console.log(_prettyjson2.default.render(obj));

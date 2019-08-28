@@ -1,3 +1,4 @@
+import Bridge from '../BridgeService'
 import ResponseAdapter from './Response/Adapter'
 import ResponseHandler from './Response/Handler'
 import OpDescList from './OpDescList'
@@ -7,11 +8,10 @@ import _ from 'lodash'
 import OPS from './OPs'
 import CallAction from './CallAction'
 import MergeCallAction from './MergeCallAction'
-import prettyjson from 'prettyjson'
 import md5 from 'md5'
 import colors from 'colors'
 
-export default class Agent
+export default class Agent extends Bridge
 {
     /*
     |--------------------------------------------------------------------------
@@ -39,6 +39,8 @@ export default class Agent
     * @return {Void}
     */
     constructor({ port, domain, id, ext, password, centerId, ssl, subProtocol }, bus = null, isDebug = false, mockConnection = null) {
+        super()
+
         this.port = port
         this.domain = domain
         this.id = id
@@ -86,28 +88,6 @@ export default class Agent
         this.connection.on('message', message => this.handler.receive(message))
     }
 
-    initBrowserSocket() {
-        this.connection = new w3cwebsocket(this.url, this.subProtocol)
-
-        this.connection.onerror = error => {
-            this.emit(Agent.events.SOCKET_ERROR, {
-                message: `Connection Error: ${error.toString()}`,
-            })
-        }
-
-        this.connection.onopen = () => this.authorize()
-
-        this.connection.onclose = () => {
-            this.hasClosed = true
-
-            this.emit(Agent.events.SOCKET_CLOSED, {
-                message: 'echo-protocol Client Closed',
-            })
-        }
-
-        this.connection.onmessage = message => this.handler.receive(message)
-    }
-
     initNodeSocket() {
         this.socket = new client()
 
@@ -129,7 +109,7 @@ export default class Agent
                     console.log(`Connection Error: ${error.toString()}`.red)
                 }
 
-                this.emit(Agent.events.SOCKET_ERROR, {
+                this.emit(Bridge.events.SOCKET_ERROR, {
                     message: `Connection Error: ${error.toString()}`
                 })
             })
@@ -141,13 +121,21 @@ export default class Agent
                     console.log(`echo-protocol Client Closed`.cyan)
                 }
 
-                this.emit(Agent.events.SOCKET_CLOSED, {
+                this.emit(Bridge.events.SOCKET_CLOSED, {
                     message: 'echo-protocol Client Closed',
                 })
             })
 
             this.authorize()
         })
+    }
+
+    onOpen() {
+        this.authorize()
+    }
+
+    onMessage(message) {
+        this.handler.receive(message)
     }
 
     /**
@@ -587,72 +575,6 @@ existing one)]
             ag: ag ? ag : this.id,
             type,
         })
-    }
-
-    /**
-     * 向 socket 發送訊息
-     *
-     * @param  {Object} obj
-     * @return {Mixed}
-     */
-    dispatch(obj) {
-        this.seq ++
-
-        if (_.isNil(obj.seq)) {
-            obj.seq = this.seq
-        }
-
-        if (this.isDebug) {
-            let opDesc = _.find(OpDescList, { code: obj.op })
-            let tail = ''
-
-            if (!_.isNil(obj.act)) {
-                let callActionDesc = _.find(CallActionDescList, { code: Number(obj.act) })
-
-                tail = callActionDesc ? `: ${callActionDesc.desc}` : ` Unknown`
-            }
-
-            opDesc ?
-                console.log(`\n${opDesc.desc}${tail} >>>>>>>>>>>>>>`.yellow) :
-                console.log(`\nUnknown: (${obj.op})${tail} >>>>>>>>>>>>>>`.red)
-
-            console.log(prettyjson.render(obj))
-        }
-
-        return this.hasClosed ? null : this.connection.send(Agent.genSendStr(obj))
-    }
-
-    emit(eventName, withData) {
-        if (this.bus) {
-            this.bus.$emit(eventName, withData)
-        }
-    }
-
-    /**
-     * 組成發送到 socket 的字串
-     *
-     * @param  {Object} obj
-     * @return {String}
-     */
-    static genSendStr(obj) {
-        let msg = ''
-
-        for (let prop in obj) {
-            msg += `${prop}=${_.get(obj, prop)}\n`
-        }
-
-        return msg
-    }
-
-    static get events() {
-        return {
-            SOCKET_ERROR: 'socket-error',
-            SOCKET_CLOSED: 'socket-closed',
-        }
-    }
-
-    get url() {
-        return `${this.protocol}://${this.domain}:${this.port}`
     }
 
     get ag() {

@@ -1,7 +1,7 @@
 {
   "name": "ezvoicetek-ezacd-node-shell",
-  "version": "1.0.2-p24",
-  "description": "ezacd 測試 shell",
+  "version": "1.0.2-p25",
+  "description": "ezacd 整合",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha --require babel-polyfill --require babel-register tests/**/**/*.spec.js",

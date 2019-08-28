@@ -35,13 +35,13 @@ export default class Handler
             obj = Adapter.toObj(data, true)
         }
 
-        let opDesc = _.find(OpDescList, { code: op })
-
         this.cb = _.find(this.cbs, {
             op,
         })
 
         if (this.isDebug) {
+            let opDesc = _.find(OpDescList, { code: op })
+
             opDesc ?
                 console.log(`\n<<<<<<<<<<<<<< ${opDesc.desc}`.cyan) :
                 console.log(`\n<<<<<<<<<<<<<< Unknown (${op})`.cyan)

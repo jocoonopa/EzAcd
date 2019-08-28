@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _BridgeService = require('../BridgeService');
+
+var _BridgeService2 = _interopRequireDefault(_BridgeService);
+
 var _Adapter = require('./Response/Adapter');
 
 var _Adapter2 = _interopRequireDefault(_Adapter);
@@ -40,10 +44,6 @@ var _MergeCallAction = require('./MergeCallAction');
 
 var _MergeCallAction2 = _interopRequireDefault(_MergeCallAction);
 
-var _prettyjson = require('prettyjson');
-
-var _prettyjson2 = _interopRequireDefault(_prettyjson);
-
 var _md = require('md5');
 
 var _md2 = _interopRequireDefault(_md);
@@ -56,7 +56,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Agent = function () {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Agent = function (_Bridge) {
+    _inherits(Agent, _Bridge);
+
     /*
     |--------------------------------------------------------------------------
     |                             Flow (以方法為開發導向)
@@ -97,27 +103,30 @@ var Agent = function () {
 
         _classCallCheck(this, Agent);
 
-        this.port = port;
-        this.domain = domain;
-        this.id = id;
-        this.password = password;
-        this.centerId = centerId;
-        this.ext = ext;
-        this.cid = null;
-        this.protocol = ssl ? 'wss' : 'ws';
-        this.isDebug = isDebug;
-        this.subProtocol = subProtocol;
+        var _this = _possibleConstructorReturn(this, (Agent.__proto__ || Object.getPrototypeOf(Agent)).call(this));
 
-        this.initSocket(mockConnection);
+        _this.port = port;
+        _this.domain = domain;
+        _this.id = id;
+        _this.password = password;
+        _this.centerId = centerId;
+        _this.ext = ext;
+        _this.cid = null;
+        _this.protocol = ssl ? 'wss' : 'ws';
+        _this.isDebug = isDebug;
+        _this.subProtocol = subProtocol;
+
+        _this.initSocket(mockConnection);
 
         /* init by self */
-        this.seq = 0;
-        this.state = null;
-        this.callState = null;
-        this.hasClosed = false;
-        this.bus = bus;
+        _this.seq = 0;
+        _this.state = null;
+        _this.callState = null;
+        _this.hasClosed = false;
+        _this.bus = bus;
 
-        this.handler = new _Handler2.default(this, bus, isDebug);
+        _this.handler = new _Handler2.default(_this, bus, isDebug);
+        return _this;
     }
 
     /**
@@ -146,42 +155,13 @@ var Agent = function () {
     }, {
         key: 'initTestSocket',
         value: function initTestSocket(mockConnection) {
-            var _this = this;
+            var _this2 = this;
 
             this.connection = mockConnection;
 
             this.connection.on('message', function (message) {
-                return _this.handler.receive(message);
-            });
-        }
-    }, {
-        key: 'initBrowserSocket',
-        value: function initBrowserSocket() {
-            var _this2 = this;
-
-            this.connection = new _websocket.w3cwebsocket(this.url, this.subProtocol);
-
-            this.connection.onerror = function (error) {
-                _this2.emit(Agent.events.SOCKET_ERROR, {
-                    message: 'Connection Error: ' + error.toString()
-                });
-            };
-
-            this.connection.onopen = function () {
-                return _this2.authorize();
-            };
-
-            this.connection.onclose = function () {
-                _this2.hasClosed = true;
-
-                _this2.emit(Agent.events.SOCKET_CLOSED, {
-                    message: 'echo-protocol Client Closed'
-                });
-            };
-
-            this.connection.onmessage = function (message) {
                 return _this2.handler.receive(message);
-            };
+            });
         }
     }, {
         key: 'initNodeSocket',
@@ -208,7 +188,7 @@ var Agent = function () {
                         console.log(('Connection Error: ' + error.toString()).red);
                     }
 
-                    _this3.emit(Agent.events.SOCKET_ERROR, {
+                    _this3.emit(_BridgeService2.default.events.SOCKET_ERROR, {
                         message: 'Connection Error: ' + error.toString()
                     });
                 });
@@ -220,13 +200,23 @@ var Agent = function () {
                         console.log('echo-protocol Client Closed'.cyan);
                     }
 
-                    _this3.emit(Agent.events.SOCKET_CLOSED, {
+                    _this3.emit(_BridgeService2.default.events.SOCKET_CLOSED, {
                         message: 'echo-protocol Client Closed'
                     });
                 });
 
                 _this3.authorize();
             });
+        }
+    }, {
+        key: 'onOpen',
+        value: function onOpen() {
+            this.authorize();
+        }
+    }, {
+        key: 'onMessage',
+        value: function onMessage(message) {
+            this.handler.receive(message);
         }
 
         /**
@@ -753,60 +743,6 @@ var Agent = function () {
                 type: type
             });
         }
-
-        /**
-         * 向 socket 發送訊息
-         *
-         * @param  {Object} obj
-         * @return {Mixed}
-         */
-
-    }, {
-        key: 'dispatch',
-        value: function dispatch(obj) {
-            this.seq++;
-
-            if (_lodash2.default.isNil(obj.seq)) {
-                obj.seq = this.seq;
-            }
-
-            if (this.isDebug) {
-                var opDesc = _lodash2.default.find(_OpDescList2.default, { code: obj.op });
-                var tail = '';
-
-                if (!_lodash2.default.isNil(obj.act)) {
-                    var callActionDesc = _lodash2.default.find(_CallActionDescList2.default, { code: Number(obj.act) });
-
-                    tail = callActionDesc ? ': ' + callActionDesc.desc : ' Unknown';
-                }
-
-                opDesc ? console.log(('\n' + opDesc.desc + tail + ' >>>>>>>>>>>>>>').yellow) : console.log(('\nUnknown: (' + obj.op + ')' + tail + ' >>>>>>>>>>>>>>').red);
-
-                console.log(_prettyjson2.default.render(obj));
-            }
-
-            return this.hasClosed ? null : this.connection.send(Agent.genSendStr(obj));
-        }
-    }, {
-        key: 'emit',
-        value: function emit(eventName, withData) {
-            if (this.bus) {
-                this.bus.$emit(eventName, withData);
-            }
-        }
-
-        /**
-         * 組成發送到 socket 的字串
-         *
-         * @param  {Object} obj
-         * @return {String}
-         */
-
-    }, {
-        key: 'url',
-        get: function get() {
-            return this.protocol + '://' + this.domain + ':' + this.port;
-        }
     }, {
         key: 'ag',
         get: function get() {
@@ -817,28 +753,9 @@ var Agent = function () {
         get: function get() {
             return (0, _md2.default)('' + this.ag + this.nonce + this.password);
         }
-    }], [{
-        key: 'genSendStr',
-        value: function genSendStr(obj) {
-            var msg = '';
-
-            for (var prop in obj) {
-                msg += prop + '=' + _lodash2.default.get(obj, prop) + '\n';
-            }
-
-            return msg;
-        }
-    }, {
-        key: 'events',
-        get: function get() {
-            return {
-                SOCKET_ERROR: 'socket-error',
-                SOCKET_CLOSED: 'socket-closed'
-            };
-        }
     }]);
 
     return Agent;
-}();
+}(_BridgeService2.default);
 
 exports.default = Agent;
