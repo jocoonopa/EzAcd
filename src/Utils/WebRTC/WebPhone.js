@@ -53,6 +53,18 @@ export default class WebPhone extends Bridge
         }
     }
 
+    onClose() {
+        this.hasClosed = true
+
+        setTimeout(() => {
+            this.initBrowserSocket()
+        }, 300)
+
+        this.emit(BridgeService.events.SOCKET_CLOSED, {
+            message: 'echo-protocol Client Closed',
+        })
+    }
+
     isIncoming() {
         return _.eq(this.callType, 'incoming')
     }
@@ -265,11 +277,13 @@ export default class WebPhone extends Bridge
     }
 
     closePeerConnection() {
-        try {
-            this.localPeerConnection.close()
+        this.localPeerConnection.close()
 
-            this.localPeerConnection = null
-        } catch (err) {}
+        if (0 < this.localStream.getAudioTracks().length) {
+            this.localStream.getAudioTracks()[0].stop()
+        }
+
+        this.localPeerConnection = null
     }
 
     /**

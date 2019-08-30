@@ -18,6 +18,8 @@ export default class BridgeService
     }
 
     onError(error) {
+        this.connection.close()
+
         this.emit(BridgeService.events.SOCKET_ERROR, {
             message: `Connection Error: ${error.toString()}`,
         })
