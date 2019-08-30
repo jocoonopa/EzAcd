@@ -52,6 +52,8 @@ export default class Agent extends Bridge
         this.isDebug = isDebug
         this.subProtocol = subProtocol
 
+        this.commandList = OpDescList
+
         this.initSocket(mockConnection)
 
         /* init by self */

@@ -41,6 +41,8 @@ export default class Adapter
      * @return {Object}
      */
     static toObj(data, isIgnoreComma = false) {
+        global.EZACD_tmp_data = data
+
         let messages = data.split("\n")
         let obj = {}
         let filledObj = message => {

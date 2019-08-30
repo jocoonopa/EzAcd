@@ -69,6 +69,8 @@ var Adapter = function () {
         value: function toObj(data) {
             var isIgnoreComma = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
+            global.EZACD_tmp_data = data;
+
             var messages = data.split("\n");
             var obj = {};
             var filledObj = function filledObj(message) {

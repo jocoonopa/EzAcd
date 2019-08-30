@@ -2,8 +2,6 @@
 
 var _EzACDAgent = require('./EzACDAgent');
 
-var _EzACDAgent2 = _interopRequireDefault(_EzACDAgent);
-
 var _prettyjson = require('prettyjson');
 
 var _prettyjson2 = _interopRequireDefault(_prettyjson);
@@ -14,7 +12,7 @@ require('./bootstrap');
 
 var commands = ['acd:performance {$dn}', 'agent:performance', 'agent:group:performance {$agroup} {$type} {$fmt}', 'agent:group:list {$agroup} {$type}', 'call:answer', 'call:hold', 'call:disconnect', 'call:mute', 'call:cancel', 'dial {$char}', 'dn:state', 'get {$key}', 'get:state', 'login', 'logout', 'make:call {$dn}', 'set:state {$state}', 'query:acd', 'restart'];
 
-var agent = new _EzACDAgent2.default({
+var agent = new _EzACDAgent.EzACDAgent({
     port: config.port,
     domain: config.domain,
     id: config.id,

@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import OpDescList from './EzACD/OpDescList'
 import CallActionDescList from './EzACD/CallActionDescList'
 import prettyjson from 'prettyjson'
 import { w3cwebsocket }  from 'websocket'
@@ -41,7 +40,7 @@ export default class BridgeService
      * @param  {Object} obj
      * @return {Mixed}
      */
-    dispatch(obj) {
+    dispatch(obj, str = null) {
         this.seq ++
 
         if (_.isNil(obj.seq)) {
@@ -49,16 +48,16 @@ export default class BridgeService
         }
 
         if (this.isDebug) {
-            this.displayAcdDebugMessage(obj)
+            this.displayDebugMessage(obj)
         }
 
-        let str = BridgeService.genSendStr(obj)
+        str = str ? str : BridgeService.genSendStr(obj)
 
         return this.hasClosed ? null : this.connection.send(str)
     }
 
-    displayAcdDebugMessage(obj) {
-        let opDesc = _.find(OpDescList, { code: obj.op })
+    displayDebugMessage(obj) {
+        let opDesc = _.find(this.commandList, { code: obj.op })
         let tail = ''
 
         if (!_.isNil(obj.act)) {

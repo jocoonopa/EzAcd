@@ -12,6 +12,10 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 var _websocket = require('websocket');
 
+var _prettyjson = require('prettyjson');
+
+var _prettyjson2 = _interopRequireDefault(_prettyjson);
+
 var _jsaes = require('./jsaes');
 
 var _BridgeService = require('../BridgeService');
@@ -21,6 +25,14 @@ var _BridgeService2 = _interopRequireDefault(_BridgeService);
 var _Adapter = require('../Adapter');
 
 var _Adapter2 = _interopRequireDefault(_Adapter);
+
+var _commandList = require('./commandList');
+
+var _commandList2 = _interopRequireDefault(_commandList);
+
+var _responseList = require('./responseList');
+
+var _responseList2 = _interopRequireDefault(_responseList);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -57,11 +69,37 @@ var WebPhone = function (_Bridge) {
         _this.seq = 0;
         _this.hasClosed = false;
 
+        _this.nonce = null;
+        _this.callId = null;
+        _this.callType = '';
+        _this.callState = null;
+        _this.muteState = null;
+        _this.remoteSdp = null;
+        _this.localSdp = null;
+        _this.localPeerConnection = null;
+        _this.remoteAudio = null;
+        _this.localStream = null;
+        _this.remoteStream = null;
+
+        _this.isDebug = isDebug;
+        _this.commandList = _commandList2.default;
+        _this.responseList = _responseList2.default;
+
         _this.initBrowserSocket();
         return _this;
     }
 
     _createClass(WebPhone, [{
+        key: 'isIncoming',
+        value: function isIncoming() {
+            return _lodash2.default.eq(this.callType, 'incoming');
+        }
+    }, {
+        key: 'isOutgoing',
+        value: function isOutgoing() {
+            return _lodash2.default.eq(this.callType, 'outgoing');
+        }
+    }, {
         key: 'onMessage',
         value: function onMessage(event) {
             var data = event.data || event.utf8Data;
@@ -69,21 +107,53 @@ var WebPhone = function (_Bridge) {
             var op = Number(_lodash2.default.get(obj, 'op'));
             var seq = Number(_lodash2.default.get(obj, 'seq'));
 
+            if (this.isDebug) {
+                var opDesc = _lodash2.default.find(this.responseList, { code: op });
+
+                opDesc ? console.log(('\n<<<<<<<<<<<<<< ' + opDesc.desc).cyan) : console.log(('\n<<<<<<<<<<<<<< Unknown (' + op + ')').cyan);
+
+                console.log(_prettyjson2.default.render(obj));
+            }
+
             switch (op) {
+                /* Connected to WebRTC server */
                 case 2000:
                     this.connectWebRTCServerCallback(obj);
                     break;
 
-                // Register Status Event
-                // Proxy Register Status Event:
-                //
-                // op=9001
-                // seq=xxx
-                // state=xxxx
-                // (0: Registered, -1: Unregistered, -2: Request Timeout, -3: Contact Updated, -xxx: sip
-                // reason code)
+                case 2006:
+                    this.answerCall(obj);
+                    break;
+
+                /**
+                 * Register Status Event
+                 * Proxy Register Status Event:
+                 *
+                 * op=9001
+                 * seq=xxx
+                 * state=xxxx
+                 * (0: Registered, -1: Unregistered, -2: Request Timeout, -3: Contact Updated, -xxx: sip
+                 * reason code)
+                 *
+                **/
                 case 9001:
-                    this.registerSipCallback(obj);
+                    this.registerStatusCallback(obj);
+                    break;
+
+                case 9002:
+                    this.incomingCallRinging(obj);
+                    break;
+
+                case 9004:
+                    this.callStateChangeCallback(obj);
+                    break;
+
+                case 9008:
+                    this.resetChannel();
+                    break;
+
+                case 9009:
+                    this.notifyToAnswer();
                     break;
             }
         }
@@ -105,9 +175,9 @@ var WebPhone = function (_Bridge) {
     }, {
         key: 'connectWebRTCServerCallback',
         value: function connectWebRTCServerCallback(obj) {
-            var nonce = _lodash2.default.get(obj, 'nonce');
+            this.nonce = _lodash2.default.get(obj, 'nonce');
             var secret = 'x%6a8';
-            var key = this.initEncrypt('' + secret + nonce + this.ext);
+            var key = this.initEncrypt('' + secret + this.nonce + this.ext);
             var pwd = this.encryptLongString(this.password, key);
 
             (0, _jsaes.AES_Done)();
@@ -121,9 +191,260 @@ var WebPhone = function (_Bridge) {
             });
         }
     }, {
-        key: 'registerSipCallback',
-        value: function registerSipCallback(obj) {
+        key: 'registerStatusCallback',
+        value: function registerStatusCallback(obj) {
             this.emit('sip-registed', obj);
+        }
+    }, {
+        key: 'incomingCallRinging',
+        value: function incomingCallRinging(obj) {
+            var _this2 = this;
+
+            this.callId = _lodash2.default.get(obj, 'cid');
+            this.callType = 'incoming';
+            this.remoteSdp = this.getSdp(global.EZACD_tmp_data);
+
+            return setTimeout(function () {
+                _this2.dispatch({
+                    op: 1006,
+                    cid: _lodash2.default.get(obj, 'cid'),
+                    seq: _this2.seq
+                });
+            }, 100);
+        }
+    }, {
+        key: 'resetChannel',
+        value: function resetChannel() {
+            this.mutecontrol(true);
+            this.mutecontrol(false);
+        }
+    }, {
+        key: 'notifyToAnswer',
+        value: function notifyToAnswer() {
+            if (_lodash2.default.eq(Number(this.callState), WebPhone.CALL_STATES.RING)) {
+                this.answerCall();
+            }
+        }
+    }, {
+        key: 'getSdp',
+        value: function getSdp(msg) {
+            var idx = msg.indexOf('sdp=');
+
+            if (0 < idx) {
+                return msg.substring(idx + 4);
+            }
+
+            return '';
+        }
+    }, {
+        key: 'gotRemoteDescription',
+        value: function gotRemoteDescription(sdp) {
+            var params = {
+                type: this.isOutgoing() ? 'answer' : 'offer',
+                sdp: sdp
+            };
+
+            this.localPeerConnection.setRemoteDescription(new RTCSessionDescription(params), this.setRemoteSuccess.bind(this));
+        }
+    }, {
+        key: 'setRemoteSuccess',
+        value: function setRemoteSuccess() {
+            if (this.isIncoming()) {
+                this.localPeerConnection.createAnswer(this.setLocalDescription.bind(this), function (e) {
+                    console.log(e);
+                    console.log(e.message);
+                });
+            }
+        }
+    }, {
+        key: 'setLocalDescription',
+        value: function setLocalDescription(description) {
+            if (this.isIncoming()) {
+                description.sdp = this.replaceString(description.sdp, "a=setup:active", "a=setup:passive");
+            }
+
+            this.localSdp = description.sdp;
+
+            this.localPeerConnection.setLocalDescription(description, this.setLocalDescriptionSuccess.bind(this), function (e) {
+                console.error(e);
+                console.error(e.message);
+            });
+        }
+    }, {
+        key: 'setLocalDescriptionSuccess',
+        value: function setLocalDescriptionSuccess() {
+            return this.isIncoming() ? this._answerCall(this.localSdp) : this.makeCall();
+        }
+    }, {
+        key: 'callStateChangeCallback',
+        value: function callStateChangeCallback(obj) {
+            this.callId = _lodash2.default.get(obj, 'cid');
+            this.callState = _lodash2.default.get(obj, 'state');
+
+            switch (Number(this.callState)) {
+                case WebPhone.CALL_STATES.DISCONNECT:
+                    this.closePeerConnection();
+
+                    this.callType = null;
+                    this.called = null;
+                    this.localSdp = null;
+                    this.remoteSdp = null;
+                    this.muteState = false;
+                    break;
+
+                case WebPhone.CALL_STATES.RING:
+                    break;
+
+                case WebPhone.CALL_STATES.CONNECT:
+                    this.mutecontrol(false);
+                    break;
+
+                case WebPhone.CALL_STATES.LOCAL_HOLD:
+                    this.mutecontrol(true);
+                    break;
+
+                case WebPhone.CALL_STATES.REMOTE_HOLD:
+                    this.mutecontrol(true);
+                    break;
+            }
+        }
+    }, {
+        key: 'closePeerConnection',
+        value: function closePeerConnection() {
+            try {
+                this.localPeerConnection.close();
+
+                this.localPeerConnection = null;
+            } catch (err) {}
+        }
+
+        /**
+         *  answerCall setLocalDescriptionSuccess
+         *
+         * @param  {String} sdp
+         * @return void
+         */
+
+    }, {
+        key: '_answerCall',
+        value: function _answerCall(sdp) {
+            return this.dispatch({
+                op: 1004,
+                cid: this.callId,
+                seq: this.seq,
+                sdp: sdp
+            });
+        }
+
+        /**
+         * 應該用不到
+         */
+
+    }, {
+        key: 'makeCall',
+        value: function makeCall() {}
+    }, {
+        key: 'replaceString',
+        value: function replaceString(str, repstr, repwith) {
+            var idx = 0 - repstr.length;
+            var idx1 = 0;
+            var result = '';
+
+            if (str != null) {
+                while (true) {
+                    idx = str.indexOf(repstr, idx + repstr.length);
+
+                    if (idx >= 0) {
+                        result += str.substring(idx1, idx);
+                        result += repwith;
+                        idx1 = idx + repstr.length;
+                    } else {
+                        if (idx1 < str.length) {
+                            result += str.substring(idx1);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+    }, {
+        key: 'gotLocalIceCandidate',
+        value: function gotLocalIceCandidate(event) {
+            if (event.candidate) {
+                if (event.candidate.candidate.indexOf(' tcp ') < 0) {
+                    this.localSdp += 'a=' + event.candidate.candidate + "\n";
+                }
+            }
+        }
+    }, {
+        key: 'gotRemoteStream',
+        value: function gotRemoteStream(event) {
+            this.remoteStream = event.streams ? event.streams[0] : event.stream;
+            this.remoteAudio = document.getElementById('remoteAudio');
+
+            _lodash2.default.set(this.remoteAudio, 'srcObject', this.remoteStream);
+        }
+    }, {
+        key: 'gotStream',
+        value: function gotStream(stream) {
+            this.localStream = stream;
+            this.localAudio = document.getElementById('localAudio');
+            this.localAudio.srcObject = stream;
+
+            var configuration = {
+                iceServers: []
+            };
+
+            var pcConstraints = {
+                optional: [{
+                    DtlsSrtpKeyAgreement: true
+                }]
+            };
+
+            this.localPeerConnection = new RTCPeerConnection(configuration, pcConstraints);
+
+            this.localPeerConnection.onicecandidate = this.gotLocalIceCandidate.bind(this);
+
+            this.localPeerConnection.ontrack = this.gotRemoteStream.bind(this);
+
+            this.localPeerConnection.addStream(this.localStream);
+
+            if (this.isOutgoing()) {
+                this.localPeerConnection.createOffer(this.setLocalDescription.bind(this), function () {});
+            } else {
+                var rtcSessionDescription = new RTCSessionDescription({
+                    'type': 'offer',
+                    'sdp': this.remoteSdp
+                });
+
+                this.localPeerConnection.setRemoteDescription(rtcSessionDescription, this.setRemoteSuccess.bind(this), function (e) {
+                    console.log(e);
+                    console.error(e.message);
+                });
+            }
+        }
+    }, {
+        key: 'answerCall',
+        value: function answerCall() {
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(this.gotStream.bind(this)).catch(function (e) {
+                return console.error(e);
+            });
+        }
+    }, {
+        key: 'mutecontrol',
+        value: function mutecontrol(muteState) {
+            if (0 < this.localStream.getAudioTracks().length) {
+                this.localStream.getAudioTracks()[0].enabled = !muteState;
+            }
+
+            if (0 < this.remoteStream.getAudioTracks().length) {
+                this.remoteStream.getAudioTracks()[0].enabled = !muteState;
+            }
+
+            this.muteState = muteState;
         }
     }, {
         key: 'initEncrypt',
@@ -185,6 +506,18 @@ var WebPhone = function (_Bridge) {
             return result;
         }
     }], [{
+        key: 'CALL_STATES',
+        get: function get() {
+            //0: Disconnected 1: Ring, 2: Connected  3:local hold  4:Remote Hold
+            return {
+                DISCONNECT: 0,
+                RING: 1,
+                CONNECT: 2,
+                LOCAL_HOLD: 3,
+                REMOTE_HOLD: 4
+            };
+        }
+    }, {
         key: 'encryptLength',
         get: function get() {
             return 16;

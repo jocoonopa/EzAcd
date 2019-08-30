@@ -116,6 +116,8 @@ var Agent = function (_Bridge) {
         _this.isDebug = isDebug;
         _this.subProtocol = subProtocol;
 
+        _this.commandList = _OpDescList2.default;
+
         _this.initSocket(mockConnection);
 
         /* init by self */

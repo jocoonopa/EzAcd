@@ -10,10 +10,6 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _OpDescList = require('./EzACD/OpDescList');
-
-var _OpDescList2 = _interopRequireDefault(_OpDescList);
-
 var _CallActionDescList = require('./EzACD/CallActionDescList');
 
 var _CallActionDescList2 = _interopRequireDefault(_CallActionDescList);
@@ -79,6 +75,8 @@ var BridgeService = function () {
     }, {
         key: 'dispatch',
         value: function dispatch(obj) {
+            var str = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
             this.seq++;
 
             if (_lodash2.default.isNil(obj.seq)) {
@@ -86,17 +84,17 @@ var BridgeService = function () {
             }
 
             if (this.isDebug) {
-                this.displayAcdDebugMessage(obj);
+                this.displayDebugMessage(obj);
             }
 
-            var str = BridgeService.genSendStr(obj);
+            str = str ? str : BridgeService.genSendStr(obj);
 
             return this.hasClosed ? null : this.connection.send(str);
         }
     }, {
-        key: 'displayAcdDebugMessage',
-        value: function displayAcdDebugMessage(obj) {
-            var opDesc = _lodash2.default.find(_OpDescList2.default, { code: obj.op });
+        key: 'displayDebugMessage',
+        value: function displayDebugMessage(obj) {
+            var opDesc = _lodash2.default.find(this.commandList, { code: obj.op });
             var tail = '';
 
             if (!_lodash2.default.isNil(obj.act)) {

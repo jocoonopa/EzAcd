@@ -1,6 +1,6 @@
 require('./bootstrap')
 
-import EzACDAgent from './EzACDAgent'
+import { EzACDAgent } from './EzACDAgent'
 import prettyjson from 'prettyjson'
 
 const commands = [
