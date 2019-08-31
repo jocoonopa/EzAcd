@@ -224,7 +224,7 @@ export default class WebPhone extends Bridge
 
     setLocalDescription(description) {
         if (this.isIncoming()) {
-            description.sdp = this.replaceString(description.sdp, "a=setup:active", "a=setup:passive")
+            description.sdp = this.replaceString(description.sdp, 'a=setup:active', 'a=setup:passive')
         }
 
         this.localSdp = description.sdp
@@ -241,7 +241,7 @@ export default class WebPhone extends Bridge
 
     setLocalDescriptionSuccess() {
         return this.isIncoming() ?
-            this._answerCall(this.localSdp) : this.makeCall()
+            this.answerCallCommand(this.localSdp) : this.makeCallCommand(this.localSdp)
     }
 
     callStateChangeCallback(obj) {
@@ -292,7 +292,7 @@ export default class WebPhone extends Bridge
      * @param  {String} sdp
      * @return void
      */
-    _answerCall(sdp) {
+    answerCallCommand(sdp) {
         return this.dispatch({
             op: 1004,
             cid: this.callId,
@@ -303,8 +303,18 @@ export default class WebPhone extends Bridge
 
     /**
      * 應該用不到
+     *
+     * make-call 應該都是ㄧ
      */
-    makeCall() {}
+    makeCallCommand(to, sdp) {
+        return this.dispatch({
+            op: 1003,
+            disp: this.tel,
+            from: this.tel,
+            to: this.called,
+            sdp,
+        })
+    }
 
     replaceString(str, repstr, repwith) {
         let idx = 0 - repstr.length
