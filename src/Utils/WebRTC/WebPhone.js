@@ -60,7 +60,7 @@ export default class WebPhone extends Bridge
             this.initBrowserSocket()
         }, 300)
 
-        this.emit(BridgeService.events.SOCKET_CLOSED, {
+        this.emit(Bridge.events.SOCKET_CLOSED, {
             message: 'echo-protocol Client Closed',
         })
     }

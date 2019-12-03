@@ -45,6 +45,8 @@ var BridgeService = function () {
     }, {
         key: 'onError',
         value: function onError(error) {
+            this.connection.close();
+
             this.emit(BridgeService.events.SOCKET_ERROR, {
                 message: 'Connection Error: ' + error.toString()
             });

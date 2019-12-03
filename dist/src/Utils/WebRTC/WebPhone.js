@@ -90,6 +90,21 @@ var WebPhone = function (_Bridge) {
     }
 
     _createClass(WebPhone, [{
+        key: 'onClose',
+        value: function onClose() {
+            var _this2 = this;
+
+            this.hasClosed = true;
+
+            setTimeout(function () {
+                _this2.initBrowserSocket();
+            }, 300);
+
+            this.emit(_BridgeService2.default.events.SOCKET_CLOSED, {
+                message: 'echo-protocol Client Closed'
+            });
+        }
+    }, {
         key: 'isIncoming',
         value: function isIncoming() {
             return _lodash2.default.eq(this.callType, 'incoming');
@@ -198,17 +213,17 @@ var WebPhone = function (_Bridge) {
     }, {
         key: 'incomingCallRinging',
         value: function incomingCallRinging(obj) {
-            var _this2 = this;
+            var _this3 = this;
 
             this.callId = _lodash2.default.get(obj, 'cid');
             this.callType = 'incoming';
             this.remoteSdp = this.getSdp(global.EZACD_tmp_data);
 
             return setTimeout(function () {
-                _this2.dispatch({
+                _this3.dispatch({
                     op: 1006,
                     cid: _lodash2.default.get(obj, 'cid'),
-                    seq: _this2.seq
+                    seq: _this3.seq
                 });
             }, 100);
         }
@@ -260,7 +275,7 @@ var WebPhone = function (_Bridge) {
         key: 'setLocalDescription',
         value: function setLocalDescription(description) {
             if (this.isIncoming()) {
-                description.sdp = this.replaceString(description.sdp, "a=setup:active", "a=setup:passive");
+                description.sdp = this.replaceString(description.sdp, 'a=setup:active', 'a=setup:passive');
             }
 
             this.localSdp = description.sdp;
@@ -273,7 +288,7 @@ var WebPhone = function (_Bridge) {
     }, {
         key: 'setLocalDescriptionSuccess',
         value: function setLocalDescriptionSuccess() {
-            return this.isIncoming() ? this._answerCall(this.localSdp) : this.makeCall();
+            return this.isIncoming() ? this.answerCallCommand(this.localSdp) : this.makeCallCommand(this.localSdp);
         }
     }, {
         key: 'callStateChangeCallback',
@@ -311,11 +326,13 @@ var WebPhone = function (_Bridge) {
     }, {
         key: 'closePeerConnection',
         value: function closePeerConnection() {
-            try {
-                this.localPeerConnection.close();
+            this.localPeerConnection.close();
 
-                this.localPeerConnection = null;
-            } catch (err) {}
+            if (0 < this.localStream.getAudioTracks().length) {
+                this.localStream.getAudioTracks()[0].stop();
+            }
+
+            this.localPeerConnection = null;
         }
 
         /**
@@ -326,8 +343,8 @@ var WebPhone = function (_Bridge) {
          */
 
     }, {
-        key: '_answerCall',
-        value: function _answerCall(sdp) {
+        key: 'answerCallCommand',
+        value: function answerCallCommand(sdp) {
             return this.dispatch({
                 op: 1004,
                 cid: this.callId,
@@ -338,11 +355,21 @@ var WebPhone = function (_Bridge) {
 
         /**
          * 應該用不到
+         *
+         * make-call 應該都是ㄧ
          */
 
     }, {
-        key: 'makeCall',
-        value: function makeCall() {}
+        key: 'makeCallCommand',
+        value: function makeCallCommand(to, sdp) {
+            return this.dispatch({
+                op: 1003,
+                disp: this.tel,
+                from: this.tel,
+                to: this.called,
+                sdp: sdp
+            });
+        }
     }, {
         key: 'replaceString',
         value: function replaceString(str, repstr, repwith) {
