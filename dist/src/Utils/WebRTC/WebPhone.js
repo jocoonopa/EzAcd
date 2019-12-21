@@ -50,7 +50,7 @@ var WebPhone = function (_Bridge) {
             ext = _ref.ext,
             password = _ref.password,
             centerId = _ref.centerId,
-            isSsl = _ref.isSsl;
+            port = _ref.port;
         var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -58,7 +58,7 @@ var WebPhone = function (_Bridge) {
 
         var _this = _possibleConstructorReturn(this, (WebPhone.__proto__ || Object.getPrototypeOf(WebPhone)).call(this));
 
-        _this.port = isSsl ? 2081 : 2082;
+        _this.port = port;
         _this.domain = domain;
         _this.ext = ext;
         _this.password = password;
