@@ -9,7 +9,7 @@ import ResponseList from './responseList'
 
 export default class WebPhone extends Bridge
 {
-    constructor({ domain, ext, password, centerId, port }, bus = null, isDebug = false) {
+    constructor({ domain, ext, password, centerId, port, isSsl }, bus = null, isDebug = false) {
         super()
 
         this.port = port

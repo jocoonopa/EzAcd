@@ -50,7 +50,8 @@ var WebPhone = function (_Bridge) {
             ext = _ref.ext,
             password = _ref.password,
             centerId = _ref.centerId,
-            port = _ref.port;
+            port = _ref.port,
+            isSsl = _ref.isSsl;
         var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
