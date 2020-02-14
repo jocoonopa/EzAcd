@@ -56,10 +56,6 @@ export default class WebPhone extends Bridge
     onClose() {
         this.hasClosed = true
 
-        setTimeout(() => {
-            this.initBrowserSocket()
-        }, 300)
-
         this.emit(Bridge.events.SOCKET_CLOSED, {
             message: 'echo-protocol Client Closed',
         })
