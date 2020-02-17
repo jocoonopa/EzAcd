@@ -357,13 +357,22 @@ existing one)]
      *
      * @param  {String} agroup
      * @param  {Number} type [0 ~ 6 p23]
+     * @param  {Number} olonly
+     *
+     * Show on line user only (for type 4-7):
+     *     0: All Agents
+     *     1: On-Line Agent Only. the default is 0
+     *
+     * It is recommend to check on-line useronly
+     *
      * @return {Void}
      */
-    getAgentGroupList(agroup, type) {
+    getAgentGroupList(agroup, type, olonly = 0) {
         return this.dispatch({
             op: OPS.GET_AGENT_GROUP_LIST,
             agroup,
             type,
+            olonly,
         })
     }
 

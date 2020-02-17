@@ -1,6 +1,6 @@
 {
   "name": "ezvoicetek-ezacd-node-shell",
-  "version": "1.0.2-p31",
+  "version": "1.0.2-p32",
   "description": "ezacd 整合",
   "main": "src/index.js",
   "scripts": {
