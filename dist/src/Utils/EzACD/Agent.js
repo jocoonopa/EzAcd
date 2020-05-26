@@ -476,16 +476,27 @@ var Agent = function (_Bridge) {
          *
          * @param  {String} agroup
          * @param  {Number} type [0 ~ 6 p23]
+         * @param  {Number} olonly
+         *
+         * Show on line user only (for type 4-7):
+         *     0: All Agents
+         *     1: On-Line Agent Only. the default is 0
+         *
+         * It is recommend to check on-line useronly
+         *
          * @return {Void}
          */
 
     }, {
         key: 'getAgentGroupList',
         value: function getAgentGroupList(agroup, type) {
+            var olonly = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
             return this.dispatch({
                 op: _OPs2.default.GET_AGENT_GROUP_LIST,
                 agroup: agroup,
-                type: type
+                type: type,
+                olonly: olonly
             });
         }
 
@@ -578,6 +589,7 @@ var Agent = function (_Bridge) {
             var fmt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
             return this.dispatch({
+                dn: dn,
                 op: _OPs2.default.GET_DN_PERFORMANCE,
                 type: type,
                 fmt: fmt

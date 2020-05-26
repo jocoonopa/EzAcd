@@ -447,6 +447,7 @@ existing one)]
      */
     getDnPerformance(dn, type = 1, fmt = 0) {
         return this.dispatch({
+            dn,
             op: OPS.GET_DN_PERFORMANCE,
             type,
             fmt,

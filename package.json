@@ -1,8 +1,8 @@
 {
   "name": "ezvoicetek-ezacd-node-shell",
-  "version": "1.0.2-p32",
+  "version": "1.0.2-p33",
   "description": "ezacd 整合",
-  "main": "src/index.js",
+  "main": "src/EzACDAgent.js",
   "scripts": {
     "test": "mocha --require babel-polyfill --require babel-register tests/**/**/*.spec.js",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
@@ -36,6 +36,7 @@
     "prettyjson": "^1.2.1",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
+    "vm2": "^3.9.1",
     "websocket": "^1.0.26"
   },
   "devDependencies": {

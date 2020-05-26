@@ -93,13 +93,7 @@ var WebPhone = function (_Bridge) {
     _createClass(WebPhone, [{
         key: 'onClose',
         value: function onClose() {
-            var _this2 = this;
-
             this.hasClosed = true;
-
-            setTimeout(function () {
-                _this2.initBrowserSocket();
-            }, 300);
 
             this.emit(_BridgeService2.default.events.SOCKET_CLOSED, {
                 message: 'echo-protocol Client Closed'
@@ -214,17 +208,17 @@ var WebPhone = function (_Bridge) {
     }, {
         key: 'incomingCallRinging',
         value: function incomingCallRinging(obj) {
-            var _this3 = this;
+            var _this2 = this;
 
             this.callId = _lodash2.default.get(obj, 'cid');
             this.callType = 'incoming';
             this.remoteSdp = this.getSdp(global.EZACD_tmp_data);
 
             return setTimeout(function () {
-                _this3.dispatch({
+                _this2.dispatch({
                     op: 1006,
                     cid: _lodash2.default.get(obj, 'cid'),
-                    seq: _this3.seq
+                    seq: _this2.seq
                 });
             }, 100);
         }
