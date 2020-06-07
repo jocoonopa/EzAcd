@@ -237,7 +237,7 @@ export default class WebPhone extends Bridge
 
     setLocalDescriptionSuccess() {
         return this.isIncoming() ?
-            this.answerCallCommand(this.localSdp) : this.makeCallCommand(this.localSdp)
+            this.dispatchAnswerCallCommand(this.localSdp) : this.dispatchMakeCallCommand(this.localSdp)
     }
 
     callStateChangeCallback(obj) {
@@ -288,7 +288,7 @@ export default class WebPhone extends Bridge
      * @param  {String} sdp
      * @return void
      */
-    answerCallCommand(sdp) {
+    dispatchAnswerCallCommand(sdp) {
         return this.dispatch({
             op: 1004,
             cid: this.callId,
@@ -302,7 +302,7 @@ export default class WebPhone extends Bridge
      *
      * make-call 應該都是ㄧ
      */
-    makeCallCommand(to, sdp) {
+    dispatchMakeCallCommand(to, sdp) {
         return this.dispatch({
             op: 1003,
             disp: this.tel,
