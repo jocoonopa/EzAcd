@@ -356,7 +356,21 @@ export default class WebPhone extends Bridge
     gotStream(stream) {
         this.localStream = stream
         this.localAudio = document.getElementById('localAudio')
-        this.localAudio.srcObject = stream
+
+        // Samuel:
+        //
+        // Hi Karick:
+        // 新版 Firefox WebRTC 在webrtc 會出現沒有聲音的問題,
+        // 如果你們有客戶需要使用Firefox Webrtc, 你們改寫的webrtc 需要修改如下:
+        // 要取得本地端媒體(mic，camera)的時候會呼叫navigator.mediaDevices.getUserMedia，
+        // 取得成功之後會呼叫gotStream function,在gotStream function裡面會有
+        // localAudio.srcObject = stream;
+        //
+        // 將這一行移除即可
+        // 我建議依此修改會比較沒有相容性的問題
+        //
+        // @jocoonopa 2020-06-12
+        // this.localAudio.srcObject = stream
 
         let configuration = {
             iceServers: [],
