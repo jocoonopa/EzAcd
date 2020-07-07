@@ -53,11 +53,19 @@ export default class WebPhone extends Bridge
         }
     }
 
+    onError(error) {
+        this.connection.close()
+
+        this.emit(Bridge.events.WEBRTC_SOCKET_ERROR, {
+            message: `Webrtc connection Error: ${error.toString()}`,
+        })
+    }
+
     onClose() {
         this.hasClosed = true
 
-        this.emit(Bridge.events.SOCKET_CLOSED, {
-            message: 'echo-protocol Client Closed',
+        this.emit(Bridge.events.WEBRTC_SOCKET_CLOSED, {
+            message: 'Webrtc client closed',
         })
     }
 

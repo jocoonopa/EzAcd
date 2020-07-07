@@ -91,12 +91,21 @@ var WebPhone = function (_Bridge) {
     }
 
     _createClass(WebPhone, [{
+        key: 'onError',
+        value: function onError(error) {
+            this.connection.close();
+
+            this.emit(_BridgeService2.default.events.WEBRTC_SOCKET_ERROR, {
+                message: 'Webrtc connection Error: ' + error.toString()
+            });
+        }
+    }, {
         key: 'onClose',
         value: function onClose() {
             this.hasClosed = true;
 
-            this.emit(_BridgeService2.default.events.SOCKET_CLOSED, {
-                message: 'echo-protocol Client Closed'
+            this.emit(_BridgeService2.default.events.WEBRTC_SOCKET_CLOSED, {
+                message: 'Webrtc client closed'
             });
         }
     }, {
@@ -283,7 +292,7 @@ var WebPhone = function (_Bridge) {
     }, {
         key: 'setLocalDescriptionSuccess',
         value: function setLocalDescriptionSuccess() {
-            return this.isIncoming() ? this.answerCallCommand(this.localSdp) : this.makeCallCommand(this.localSdp);
+            return this.isIncoming() ? this.dispatchAnswerCallCommand(this.localSdp) : this.dispatchMakeCallCommand(this.localSdp);
         }
     }, {
         key: 'callStateChangeCallback',
@@ -338,8 +347,8 @@ var WebPhone = function (_Bridge) {
          */
 
     }, {
-        key: 'answerCallCommand',
-        value: function answerCallCommand(sdp) {
+        key: 'dispatchAnswerCallCommand',
+        value: function dispatchAnswerCallCommand(sdp) {
             return this.dispatch({
                 op: 1004,
                 cid: this.callId,
@@ -355,8 +364,8 @@ var WebPhone = function (_Bridge) {
          */
 
     }, {
-        key: 'makeCallCommand',
-        value: function makeCallCommand(to, sdp) {
+        key: 'dispatchMakeCallCommand',
+        value: function dispatchMakeCallCommand(to, sdp) {
             return this.dispatch({
                 op: 1003,
                 disp: this.tel,
@@ -414,7 +423,21 @@ var WebPhone = function (_Bridge) {
         value: function gotStream(stream) {
             this.localStream = stream;
             this.localAudio = document.getElementById('localAudio');
-            this.localAudio.srcObject = stream;
+
+            // Samuel:
+            //
+            // Hi Karick:
+            // 新版 Firefox WebRTC 在webrtc 會出現沒有聲音的問題,
+            // 如果你們有客戶需要使用Firefox Webrtc, 你們改寫的webrtc 需要修改如下:
+            // 要取得本地端媒體(mic，camera)的時候會呼叫navigator.mediaDevices.getUserMedia，
+            // 取得成功之後會呼叫gotStream function,在gotStream function裡面會有
+            // localAudio.srcObject = stream;
+            //
+            // 將這一行移除即可
+            // 我建議依此修改會比較沒有相容性的問題
+            //
+            // @jocoonopa 2020-06-12
+            // this.localAudio.srcObject = stream
 
             var configuration = {
                 iceServers: []

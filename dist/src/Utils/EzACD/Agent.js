@@ -211,6 +211,24 @@ var Agent = function (_Bridge) {
             });
         }
     }, {
+        key: 'onError',
+        value: function onError(error) {
+            this.connection.close();
+
+            this.emit(_BridgeService2.default.events.ACD_SOCKET_ERROR, {
+                message: 'Acd connection error: ' + error.toString()
+            });
+        }
+    }, {
+        key: 'onClose',
+        value: function onClose() {
+            this.hasClosed = true;
+
+            this.emit(_BridgeService2.default.events.ACD_SOCKET_CLOSED, {
+                message: 'Acd client closed'
+            });
+        }
+    }, {
         key: 'onOpen',
         value: function onOpen() {
             this.authorize();

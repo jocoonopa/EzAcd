@@ -154,8 +154,10 @@ var BridgeService = function () {
         key: 'events',
         get: function get() {
             return {
-                SOCKET_ERROR: 'socket-error',
-                SOCKET_CLOSED: 'socket-closed',
+                ACD_SOCKET_ERROR: 'acd-socket-error',
+                ACD_SOCKET_CLOSED: 'acd-socket-closed',
+                WEBRTC_SOCKET_ERROR: 'webrtc-socket-error',
+                WEBRTC_SOCKET_CLOSED: 'webrtc-socket-closed',
                 WEBRTC_OPEN: 'webrtc-opened'
             };
         }

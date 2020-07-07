@@ -132,6 +132,22 @@ export default class Agent extends Bridge
         })
     }
 
+    onError(error) {
+        this.connection.close()
+
+        this.emit(Bridge.events.ACD_SOCKET_ERROR, {
+            message: `Acd connection error: ${error.toString()}`,
+        })
+    }
+
+    onClose() {
+        this.hasClosed = true
+
+        this.emit(Bridge.events.ACD_SOCKET_CLOSED, {
+            message: 'Acd client closed',
+        })
+    }
+
     onOpen() {
         this.authorize()
     }
