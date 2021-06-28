@@ -276,11 +276,13 @@ export default class Agent extends Bridge
      * @param  {Number} seq  [Unique command sequence]
      * @return {Void}
      */
-    makeCall(dn, seq) {
+    makeCall(dn, seq, ani, cdata) {
         return this.dispatch({
             op: OPS.MAKE_CALL,
             seq,
             tel: dn,
+            ani,
+            cdata,
         })
     }
 

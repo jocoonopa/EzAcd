@@ -1,6 +1,6 @@
 {
   "name": "ezvoicetek-ezacd-node-shell",
-  "version": "1.0.2-p35",
+  "version": "1.0.2-p36",
   "description": "ezacd 整合",
   "main": "src/EzACDAgent.js",
   "scripts": {
@@ -36,7 +36,7 @@
     "prettyjson": "^1.2.1",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
-    "vm2": "^3.9.1",
+    "vm2": "^3.9.2",
     "websocket": "^1.0.26"
   },
   "devDependencies": {
@@ -50,9 +50,9 @@
     "babel-register": "^6.26.0",
     "mocha": "^5.2.0",
     "mocha-webpack": "^1.1.0",
-    "mock-socket": "^8.0.2",
-    "rimraf": "^2.6.2",
-    "sinon": "^6.1.5"
+    "mock-socket": "^8.1.1",
+    "rimraf": "^2.7.1",
+    "sinon": "^6.3.5"
   },
   "homepage": "https://github.com/jocoonopa/EzAcd"
 }

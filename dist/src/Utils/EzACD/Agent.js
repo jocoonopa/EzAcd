@@ -383,11 +383,13 @@ var Agent = function (_Bridge) {
 
     }, {
         key: 'makeCall',
-        value: function makeCall(dn, seq) {
+        value: function makeCall(dn, seq, ani, cdata) {
             return this.dispatch({
                 op: _OPs2.default.MAKE_CALL,
                 seq: seq,
-                tel: dn
+                tel: dn,
+                ani: ani,
+                cdata: cdata
             });
         }
 
