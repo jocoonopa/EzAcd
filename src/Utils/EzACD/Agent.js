@@ -38,7 +38,7 @@ export default class Agent extends Bridge
     * @param  {Object} mockConnection     [方便測試用，初始化時不建立 socket]
     * @return {Void}
     */
-    constructor({ port, domain, id, ext, password, centerId, ssl, subProtocol }, bus = null, isDebug = false, mockConnection = null) {
+    constructor({ port, domain, id, ext, password, centerId, ssl, subProtocol, cid = null }, bus = null, isDebug = false, mockConnection = null) {
         super()
 
         this.port = port
@@ -47,7 +47,7 @@ export default class Agent extends Bridge
         this.password = password
         this.centerId = centerId
         this.ext = ext
-        this.cid = null
+        this.cid = cid
         this.protocol = ssl ? 'wss' : 'ws'
         this.isDebug = isDebug
         this.subProtocol = subProtocol

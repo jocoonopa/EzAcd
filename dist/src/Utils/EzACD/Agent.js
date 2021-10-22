@@ -96,7 +96,9 @@ var Agent = function (_Bridge) {
             password = _ref.password,
             centerId = _ref.centerId,
             ssl = _ref.ssl,
-            subProtocol = _ref.subProtocol;
+            subProtocol = _ref.subProtocol,
+            _ref$cid = _ref.cid,
+            cid = _ref$cid === undefined ? null : _ref$cid;
         var bus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var isDebug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         var mockConnection = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -111,7 +113,7 @@ var Agent = function (_Bridge) {
         _this.password = password;
         _this.centerId = centerId;
         _this.ext = ext;
-        _this.cid = null;
+        _this.cid = cid;
         _this.protocol = ssl ? 'wss' : 'ws';
         _this.isDebug = isDebug;
         _this.subProtocol = subProtocol;
