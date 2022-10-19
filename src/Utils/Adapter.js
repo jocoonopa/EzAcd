@@ -46,7 +46,8 @@ export default class Adapter
         let messages = data.split("\n")
         let obj = {}
         let filledObj = message => {
-            let pair = message.split('=')
+            const isCdata = message.startsWith('cdata=')
+            let pair = isCdata ? message.split(/=(.*)/s, 2) : message.split('=')
 
             return obj[pair[0]] = _.gt(pair.length, 2) ? Adapter.agentListStringHandle(_.slice(pair, 1).join('=')) : pair[1]
         }

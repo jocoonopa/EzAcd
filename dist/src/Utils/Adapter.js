@@ -74,7 +74,8 @@ var Adapter = function () {
             var messages = data.split("\n");
             var obj = {};
             var filledObj = function filledObj(message) {
-                var pair = message.split('=');
+                var isCdata = message.startsWith('cdata=');
+                var pair = isCdata ? message.split(/=(.*)/s, 2) : message.split('=');
 
                 return obj[pair[0]] = _lodash2.default.gt(pair.length, 2) ? Adapter.agentListStringHandle(_lodash2.default.slice(pair, 1).join('=')) : pair[1];
             };
