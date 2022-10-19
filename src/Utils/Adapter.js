@@ -46,6 +46,11 @@ export default class Adapter
         let messages = data.split("\n")
         let obj = {}
         let filledObj = message => {
+            /**
+             * 因為 cData 可能會傳入網址並夾帶 Query String，如 https://firstline.cc?emplyee=easond
+             * 故會包含 = 等於符號，避免被拆解，所以特別額外判斷。
+             * @type {Boolean}
+             */
             const isCdata = message.startsWith('cdata=')
             let pair = isCdata ? message.split(/=(.*)/s, 2) : message.split('=')
 
